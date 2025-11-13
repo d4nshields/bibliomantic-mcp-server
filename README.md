@@ -27,36 +27,11 @@ This server demonstrates how traditional wisdom systems can be thoughtfully inte
 
 ## Installation
 
-### Using uvx (recommended)
-```bash
-uvx bibliomantic-mcp-server
-```
-
-### Using pip
-```bash
-pip install bibliomantic-mcp-server
-```
-
 ### From source
 ```bash
 git clone https://github.com/dshields/bibliomantic-mcp-server.git
 cd bibliomantic-mcp-server
 pip install -e .
-```
-
-## Claude Desktop Configuration
-
-Add to your `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "bibliomantic": {
-      "command": "uvx",
-      "args": ["bibliomantic-mcp-server"]
-    }
-  }
-}
 ```
 
 Alternative configurations:
