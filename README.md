@@ -47,6 +47,21 @@ Alternative configurations:
 }
 ```
 
+### Optional: Extended Wilhelm–Baynes data (text/comments split, pinyin, symbols)
+
+For judgment/image/line **oracle vs commentary** split and extra metadata (pinyin, hex symbols ䷀…䷿), you can use the [adamblvck/iching-wilhelm-dataset](https://github.com/adamblvck/iching-wilhelm-dataset) (MIT). The server looks for it in this order:
+
+1. **Submodule** (recommended; no large file in this repo):
+   ```bash
+   git submodule add https://github.com/adamblvck/iching-wilhelm-dataset.git vendor/iching-wilhelm-dataset
+   git submodule update --init --recursive
+   ```
+   Clone with submodules: `git clone --recurse-submodules …` or after clone run `git submodule update --init --recursive`.
+
+2. **Bundled JSON**: place `iching_wilhelm_translation.json` in the project root or in `data/` (e.g. converted from the dataset’s `data/iching_wilhelm_translation.js` by stripping `export default ` and the trailing `;`).
+
+Without this data, the server still runs with built-in content (short judgment/image/lines for hexagrams 1, 2, 11, 63; generic text for the rest).
+
 ## Available Tools
 
 - **`i_ching_divination`** - Generate random hexagrams with traditional interpretations

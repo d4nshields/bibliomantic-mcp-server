@@ -157,13 +157,20 @@ class EnhancedBiblioManticDiviner:
         result = f"🔮 **Enhanced Bibliomantic Consultation**\n\n"
         result += f"**Your Question:** {query}\n\n"
         
-        # Enhanced hexagram presentation
+        # Enhanced hexagram presentation (use hex_unicode from adamblvck when available)
+        symbol = getattr(hexagram, "hex_unicode", None) or hexagram.unicode_symbol
         result += f"**Oracle's Guidance - Hexagram {hexagram.number}: {hexagram.english_name}**\n"
-        result += f"*{hexagram.chinese_name} {hexagram.unicode_symbol}*\n\n"
+        result += f"*{hexagram.chinese_name} {symbol}*\n\n"
         
-        # Judgment and Image (core I Ching elements)
-        result += f"**Judgment:** {hexagram.judgment}\n\n"
-        result += f"**Image:** {hexagram.image}\n\n"
+        # Judgment and Image (core I Ching elements; use text/comments split when available)
+        if getattr(hexagram, "judgment_text", None):
+            result += f"**Judgment:** *{hexagram.judgment_text}*\n\n{hexagram.judgment_comments or ''}\n\n"
+        else:
+            result += f"**Judgment:** {hexagram.judgment}\n\n"
+        if getattr(hexagram, "image_text", None):
+            result += f"**Image:** *{hexagram.image_text}*\n\n{hexagram.image_comments or ''}\n\n"
+        else:
+            result += f"**Image:** {hexagram.image}\n\n"
         
         # Context-specific guidance
         if context != "general" and context in hexagram.interpretations:
@@ -171,12 +178,17 @@ class EnhancedBiblioManticDiviner:
         else:
             result += f"**General Meaning:** {hexagram.general_meaning}\n\n"
         
-        # Changing lines guidance if present
+        # Changing lines guidance if present (use text/comments split when available)
         if changing_lines:
             result += f"**Changing Lines:** {', '.join(map(str, changing_lines))}\n\n"
-            line_guidance = self.enhanced_engine.get_changing_line_guidance(hexagram.number, changing_lines)
-            for guidance in line_guidance:
-                result += f"• {guidance}\n"
+            line_texts = getattr(hexagram, "changing_line_texts", None)
+            line_comments = getattr(hexagram, "changing_line_comments", None)
+            for line_num in changing_lines:
+                if line_texts and line_num in line_texts and line_comments and line_num in line_comments:
+                    result += f"• **Line {line_num}:** *{line_texts[line_num]}*\n\n  {line_comments[line_num]}\n\n"
+                else:
+                    guidance = self.enhanced_engine.get_changing_line_guidance(hexagram.number, [line_num])
+                    result += f"• {guidance[0]}\n" if guidance else f"• Line {line_num}: Traditional interpretation\n"
             result += "\n"
             
             if resulting_hexagram:

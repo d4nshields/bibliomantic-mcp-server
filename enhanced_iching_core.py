@@ -1,7 +1,13 @@
 """
-Enhanced I Ching Core - Complete data layer with traditional interpretations
-Maintains 100% backward compatibility while dramatically improving content quality
-Fixed to avoid circular imports
+Enhanced I Ching Core - Complete data layer with traditional interpretations.
+Maintains backward compatibility while improving content quality.
+
+Data source (full Wilhelm–Baynes, all 64 hexagrams):
+  Optional: adamblvck/iching-wilhelm-dataset via submodule
+  (vendor/iching-wilhelm-dataset/data/iching_wilhelm_translation.js) or
+  JSON (data/iching_wilhelm_translation.json or project root). See README.
+  When absent, built-in judgment/image/lines for hexagrams 1, 2, 11, 63;
+  generic text for the rest. See docs/ADR-002-wilhelm-dataset-extended.md.
 """
 
 import json
@@ -21,7 +27,7 @@ class Trigram:
     family_member: str
     binary: str
 
-@dataclass  
+@dataclass
 class EnhancedHexagram:
     number: int
     chinese_name: str
@@ -36,15 +42,105 @@ class EnhancedHexagram:
     interpretations: Dict[str, str]  # context-specific interpretations
     changing_lines: Dict[int, str]  # line number -> interpretation
     commentary: Dict[str, str]  # different commentary sources
+    # Extended (ADR-002): optional fields from adamblvck/iching-wilhelm-dataset
+    pinyin: Optional[str] = None
+    hex_unicode: Optional[str] = None
+    english_short: Optional[str] = None
+    wilhelm_symbolic: Optional[str] = None
+    wilhelm_above: Optional[Dict[str, str]] = None
+    wilhelm_below: Optional[Dict[str, str]] = None
+    judgment_text: Optional[str] = None
+    judgment_comments: Optional[str] = None
+    image_text: Optional[str] = None
+    image_comments: Optional[str] = None
+    changing_line_texts: Optional[Dict[int, str]] = None
+    changing_line_comments: Optional[Dict[int, str]] = None
 
 class EnhancedIChing:
-    """Enhanced I Ching engine with rich traditional content"""
+    """Enhanced I Ching engine with rich traditional content.
+    Full Wilhelm–Baynes text (and optional extended fields) when adamblvck
+    dataset is present (submodule or data/ JSON); otherwise built-ins only.
+    """
     
     def __init__(self):
         self.trigrams = self._load_trigrams()
+        self._adamblvck = self._load_wilhelm_dataset_adamblvck()
         self.hexagrams = self._load_hexagrams()
         self.king_wen_sequence = self._build_king_wen_sequence()
-    
+
+    def _load_wilhelm_dataset_adamblvck(self) -> Dict[int, Dict[str, Any]]:
+        """Load adamblvck/iching-wilhelm-dataset: submodule .js or local .json.
+        Submodule: vendor/iching-wilhelm-dataset (see README). Fallback: data/iching_wilhelm_translation.json
+        """
+        data_dir = Path(__file__).resolve().parent
+        # 1) Submodule: vendor/iching-wilhelm-dataset/data/iching_wilhelm_translation.js
+        js_path = data_dir / "vendor" / "iching-wilhelm-dataset" / "data" / "iching_wilhelm_translation.js"
+        if js_path.exists():
+            try:
+                raw = self._parse_adamblvck_js(js_path)
+                if raw:
+                    return {int(k): v for k, v in raw.items()}
+            except (json.JSONDecodeError, OSError):
+                pass
+        # 2) Local JSON (e.g. committed or downloaded)
+        for path in (data_dir / "data" / "iching_wilhelm_translation.json", data_dir / "iching_wilhelm_translation.json"):
+            if path.exists():
+                with open(path, encoding="utf-8") as f:
+                    raw = json.load(f)
+                return {int(k): v for k, v in raw.items()}
+        return {}
+
+    @staticmethod
+    def _parse_adamblvck_js(js_path: Path) -> Dict[str, Any]:
+        """Parse adamblvck .js file: 'export default {...};' -> JSON."""
+        text = js_path.read_text(encoding="utf-8")
+        text = text.strip()
+        if text.startswith("export default "):
+            text = text[len("export default ") :]
+        if text.endswith(";"):
+            text = text[:-1]
+        return json.loads(text)
+
+    def _adamblvck_hexagram_fields(
+        self, num: int, ad: Dict[str, Any], fallback_english: str, fallback_general: str
+    ) -> Tuple[str, str, Dict[int, str], str, Dict[str, Any]]:
+        """From adamblvck entry return (judgment, image, changing_lines, wilhelm_commentary, extended_kwargs)."""
+        j = ad.get("wilhelm_judgment") or {}
+        judgment_text = (j.get("text") or "").strip()
+        judgment_comments = (j.get("comments") or "").strip()
+        judgment = (judgment_text + " " + judgment_comments).strip() or fallback_general
+        img = ad.get("wilhelm_image") or {}
+        image_text = (img.get("text") or "").strip()
+        image_comments = (img.get("comments") or "").strip()
+        image = (image_text + " " + image_comments).strip() or f"The image of {fallback_english}."
+        lines = ad.get("wilhelm_lines") or {}
+        changing_line_texts: Dict[int, str] = {}
+        changing_line_comments: Dict[int, str] = {}
+        changing_lines: Dict[int, str] = {}
+        for n in range(1, 7):
+            line = lines.get(str(n)) or {}
+            t = (line.get("text") or "").strip()
+            c = (line.get("comments") or "").strip()
+            changing_line_texts[n] = t
+            changing_line_comments[n] = c
+            changing_lines[n] = (t + " " + c).strip() or f"Line {n}: Traditional interpretation."
+        wilhelm_commentary = judgment_comments or judgment
+        extended: Dict[str, Any] = {
+            "pinyin": ad.get("pinyin"),
+            "hex_unicode": ad.get("hex_font"),
+            "english_short": ad.get("english"),
+            "wilhelm_symbolic": ad.get("wilhelm_symbolic"),
+            "wilhelm_above": ad.get("wilhelm_above"),
+            "wilhelm_below": ad.get("wilhelm_below"),
+            "judgment_text": judgment_text or None,
+            "judgment_comments": judgment_comments or None,
+            "image_text": image_text or None,
+            "image_comments": image_comments or None,
+            "changing_line_texts": changing_line_texts,
+            "changing_line_comments": changing_line_comments,
+        }
+        return judgment, image, changing_lines, wilhelm_commentary, extended
+
     def _load_trigrams(self) -> Dict[str, Trigram]:
         return {
             "heaven": Trigram("Heaven", "乾", "☰", "Metal", "Northwest", "Creative", "Father", "111"),
@@ -163,78 +259,85 @@ class EnhancedIChing:
         
         # Create enhanced hexagrams for the fully developed ones
         for num, (chinese_name, english_name, unicode_symbol, binary, upper_trigram, lower_trigram, judgment, image, general_meaning) in enhanced_data.items():
-            if num == 1:
-                interpretations = {
-                    "career": "Excellent time for leadership roles, starting new projects, or taking initiative. Your creative energy is at its peak. Consider proposing new ideas or seeking advancement opportunities.",
-                    "relationships": "Strong masculine energy dominates - balance this with receptive qualities. Good time for taking the lead in relationship matters, but be mindful not to overwhelm your partner.",
-                    "creative": "Prime time for creative endeavors. Your innovative ideas have tremendous power to manifest into reality. Trust your vision and begin new artistic projects.",
-                    "personal": "Focus on self-development and taking charge of your destiny. Leadership opportunities await. This is your time to step into your power and embrace your potential.",
-                    "business": "Ideal conditions for launching new ventures or expanding existing ones. Trust your vision and act decisively. The cosmic forces support bold business initiatives."
-                }
-                changing_lines = {
-                    1: "Hidden dragon. Do not act. The time is not yet right for action. Prepare and cultivate your strength in silence.",
-                    2: "Dragon appearing in the field. It furthers one to see the great man. Begin to emerge but seek guidance from experienced mentors.",
-                    3: "All day long the superior man is creatively active. At nightfall his mind is still beset with cares. Danger. No blame.",
-                    4: "Wavering flight over the depths. No blame. Test your wings cautiously but be prepared to retreat if necessary.",
-                    5: "Flying dragon in the heavens. It furthers one to see the great man. Peak of power and influence achieved.",
-                    6: "Arrogant dragon will have cause to repent. Overconfidence leads to downfall. Know when to step back."
-                }
+            interpretations = {
+                "career": f"{general_meaning} Applied to career situations.",
+                "relationships": f"{general_meaning} Applied to relationship dynamics.",
+                "creative": f"{general_meaning} Applied to creative endeavors.",
+                "personal": f"{general_meaning} Applied to personal development.",
+                "business": f"{general_meaning} Applied to business decisions."
+            }
+            ad = self._adamblvck.get(num)
+            if ad:
+                judgment, image, changing_lines, wilhelm_commentary, extended = self._adamblvck_hexagram_fields(
+                    num, ad, english_name, general_meaning
+                )
+                chinese_name = ad.get("trad_chinese") or chinese_name
                 commentary = {
-                    "wilhelm": "The Creative principle is represented by heaven, which embodies pure yang energy. It symbolizes the power of creation and the drive toward achievement.",
-                    "psychological": "Represents the animus, the masculine principle of consciousness. A call to take initiative and assert one's will in the world.",
-                    "modern": "This hexagram suggests a time of high energy and creative potential. Channel this powerful force constructively to achieve meaningful goals."
-                }
-            elif num == 2:
-                interpretations = {
-                    "career": "Support others' initiatives rather than trying to lead. Your strength lies in being the foundation that others can build upon.",
-                    "relationships": "Focus on nurturing and supporting your partner. Practice deep listening and receptivity to create emotional safety.",
-                    "creative": "Allow ideas to gestate naturally. This is a time for reflection, gathering inspiration, and preparation rather than active creation.",
-                    "personal": "Develop your inner resources and intuitive wisdom. Practice patience and trust in the natural unfolding of events.",
-                    "business": "Support and strengthen existing ventures rather than starting new ones. Focus on building solid foundations and team cohesion."
-                }
-                changing_lines = {
-                    1: "When there is hoarfrost underfoot, solid ice is not far off. Pay attention to early warning signs in your situation.",
-                    2: "Straight, square, great. Without purpose, yet nothing remains unfurthered. Natural goodness needs no artifice.",
-                    3: "Hidden lines. One is able to remain persevering. Work quietly behind the scenes without seeking recognition.",
-                    4: "A tied-up sack. No blame, no praise. Sometimes discretion is the better part of valor.",
-                    5: "A yellow lower garment brings supreme good fortune. Modesty and appropriateness in all things bring success.",
-                    6: "Dragons fight in the meadow. Their blood is black and yellow. When yin energy reaches its extreme, change begins."
-                }
-                commentary = {
-                    "wilhelm": "The Receptive represents the earth principle, pure yin energy that supports and nurtures all life.",
-                    "psychological": "Represents the anima, the feminine principle of the unconscious. A call to develop receptivity and intuitive wisdom.",
-                    "modern": "This hexagram counsels patience and supportive action. Sometimes the greatest strength lies in yielding and supporting others."
-                }
-            else:
-                # Standard interpretations for other enhanced hexagrams
-                interpretations = {
-                    "career": f"{general_meaning} Applied to career situations.",
-                    "relationships": f"{general_meaning} Applied to relationship dynamics.",
-                    "creative": f"{general_meaning} Applied to creative endeavors.",
-                    "personal": f"{general_meaning} Applied to personal development.",
-                    "business": f"{general_meaning} Applied to business decisions."
-                }
-                changing_lines = {i: f"Line {i}: Traditional changing line interpretation for {english_name}." for i in range(1, 7)}
-                commentary = {
-                    "wilhelm": f"Traditional interpretation: {general_meaning}",
+                    "wilhelm": wilhelm_commentary,
+                    "psychological": "Traditional commentary on the hexagram's symbolic meaning.",
                     "modern": f"Contemporary application: {general_meaning}"
                 }
-            
-            hexagrams[num] = EnhancedHexagram(
-                number=num,
-                chinese_name=chinese_name,
-                english_name=english_name,
-                unicode_symbol=unicode_symbol,
-                binary=binary,
-                upper_trigram=upper_trigram,
-                lower_trigram=lower_trigram,
-                judgment=judgment,
-                image=image,
-                general_meaning=general_meaning,
-                interpretations=interpretations,
-                changing_lines=changing_lines,
-                commentary=commentary
-            )
+                hexagrams[num] = EnhancedHexagram(
+                    number=num,
+                    chinese_name=chinese_name,
+                    english_name=english_name,
+                    unicode_symbol=unicode_symbol,
+                    binary=binary,
+                    upper_trigram=upper_trigram,
+                    lower_trigram=lower_trigram,
+                    judgment=judgment,
+                    image=image,
+                    general_meaning=general_meaning,
+                    interpretations=interpretations,
+                    changing_lines=changing_lines,
+                    commentary=commentary,
+                    **extended
+                )
+            else:
+                # Built-in content when adamblvck (submodule/JSON) not present
+                if num == 1:
+                    changing_lines = {
+                        1: "Hidden dragon. Do not act. The time is not yet right for action. Prepare and cultivate your strength in silence.",
+                        2: "Dragon appearing in the field. It furthers one to see the great man. Begin to emerge but seek guidance from experienced mentors.",
+                        3: "All day long the superior man is creatively active. At nightfall his mind is still beset with cares. Danger. No blame.",
+                        4: "Wavering flight over the depths. No blame. Test your wings cautiously but be prepared to retreat if necessary.",
+                        5: "Flying dragon in the heavens. It furthers one to see the great man. Peak of power and influence achieved.",
+                        6: "Arrogant dragon will have cause to repent. Overconfidence leads to downfall. Know when to step back."
+                    }
+                    wilhelm_commentary = "The Creative principle is represented by heaven, which embodies pure yang energy. It symbolizes the power of creation and the drive toward achievement."
+                elif num == 2:
+                    changing_lines = {
+                        1: "When there is hoarfrost underfoot, solid ice is not far off. Pay attention to early warning signs in your situation.",
+                        2: "Straight, square, great. Without purpose, yet nothing remains unfurthered. Natural goodness needs no artifice.",
+                        3: "Hidden lines. One is able to remain persevering. Work quietly behind the scenes without seeking recognition.",
+                        4: "A tied-up sack. No blame, no praise. Sometimes discretion is the better part of valor.",
+                        5: "A yellow lower garment brings supreme good fortune. Modesty and appropriateness in all things bring success.",
+                        6: "Dragons fight in the meadow. Their blood is black and yellow. When yin energy reaches its extreme, change begins."
+                    }
+                    wilhelm_commentary = "The Receptive represents the earth principle, pure yin energy that supports and nurtures all life."
+                else:
+                    changing_lines = {i: f"Line {i}: Traditional changing line interpretation for {english_name}." for i in range(1, 7)}
+                    wilhelm_commentary = f"Traditional interpretation: {general_meaning}"
+                commentary = {
+                    "wilhelm": wilhelm_commentary,
+                    "psychological": "Traditional commentary on the hexagram's symbolic meaning.",
+                    "modern": f"Contemporary application: {general_meaning}"
+                }
+                hexagrams[num] = EnhancedHexagram(
+                    number=num,
+                    chinese_name=chinese_name,
+                    english_name=english_name,
+                    unicode_symbol=unicode_symbol,
+                    binary=binary,
+                    upper_trigram=upper_trigram,
+                    lower_trigram=lower_trigram,
+                    judgment=judgment,
+                    image=image,
+                    general_meaning=general_meaning,
+                    interpretations=interpretations,
+                    changing_lines=changing_lines,
+                    commentary=commentary
+                )
         
         # Create standard hexagrams for the rest
         for num, (english_name, binary, general_meaning) in standard_data.items():
@@ -243,31 +346,59 @@ class EnhancedIChing:
                 lower_binary = binary[3:]
                 upper_trigram = self._binary_to_trigram(upper_binary)
                 lower_trigram = self._binary_to_trigram(lower_binary)
-                
-                hexagrams[num] = EnhancedHexagram(
-                    number=num,
-                    chinese_name=f"Hexagram {num}",
-                    english_name=english_name,
-                    unicode_symbol=self._get_unicode_symbol(upper_trigram, lower_trigram),
-                    binary=binary,
-                    upper_trigram=upper_trigram,
-                    lower_trigram=lower_trigram,
-                    judgment=general_meaning,
-                    image=f"The image of {english_name}.",
-                    general_meaning=general_meaning,
-                    interpretations={
-                        "career": f"{general_meaning} Applied to career matters.",
-                        "relationships": f"{general_meaning} Applied to relationship dynamics.",
-                        "creative": f"{general_meaning} Applied to creative endeavors.",
-                        "personal": f"{general_meaning} Applied to personal growth.",
-                        "business": f"{general_meaning} Applied to business decisions."
-                    },
-                    changing_lines={i: f"Line {i}: Traditional interpretation for changing line in {english_name}." for i in range(1, 7)},
-                    commentary={
-                        "wilhelm": f"Traditional interpretation: {general_meaning}",
-                        "modern": f"Contemporary application: {general_meaning}"
-                    }
-                )
+                interpretations = {
+                    "career": f"{general_meaning} Applied to career matters.",
+                    "relationships": f"{general_meaning} Applied to relationship dynamics.",
+                    "creative": f"{general_meaning} Applied to creative endeavors.",
+                    "personal": f"{general_meaning} Applied to personal growth.",
+                    "business": f"{general_meaning} Applied to business decisions."
+                }
+                ad = self._adamblvck.get(num)
+                if ad:
+                    judgment, image, changing_lines, wilhelm_commentary, extended = self._adamblvck_hexagram_fields(
+                        num, ad, english_name, general_meaning
+                    )
+                    chinese_name = ad.get("trad_chinese") or f"Hexagram {num}"
+                    hexagrams[num] = EnhancedHexagram(
+                        number=num,
+                        chinese_name=chinese_name,
+                        english_name=english_name,
+                        unicode_symbol=self._get_unicode_symbol(upper_trigram, lower_trigram),
+                        binary=binary,
+                        upper_trigram=upper_trigram,
+                        lower_trigram=lower_trigram,
+                        judgment=judgment,
+                        image=image,
+                        general_meaning=general_meaning,
+                        interpretations=interpretations,
+                        changing_lines=changing_lines,
+                        commentary={"wilhelm": wilhelm_commentary, "modern": f"Contemporary application: {general_meaning}"},
+                        **extended
+                    )
+                else:
+                    # Built-in content when adamblvck (submodule/JSON) not present
+                    judgment = general_meaning
+                    image = f"The image of {english_name}."
+                    changing_lines = {i: f"Line {i}: Traditional interpretation for changing line in {english_name}." for i in range(1, 7)}
+                    wilhelm_commentary = f"Traditional interpretation: {general_meaning}"
+                    hexagrams[num] = EnhancedHexagram(
+                        number=num,
+                        chinese_name=f"Hexagram {num}",
+                        english_name=english_name,
+                        unicode_symbol=self._get_unicode_symbol(upper_trigram, lower_trigram),
+                        binary=binary,
+                        upper_trigram=upper_trigram,
+                        lower_trigram=lower_trigram,
+                        judgment=judgment,
+                        image=image,
+                        general_meaning=general_meaning,
+                        interpretations=interpretations,
+                        changing_lines=changing_lines,
+                        commentary={
+                            "wilhelm": wilhelm_commentary,
+                            "modern": f"Contemporary application: {general_meaning}"
+                        }
+                    )
         
         return hexagrams
     

@@ -99,6 +99,21 @@ class TestEnhancedFeatures:
         assert len(hex1.interpretations) >= 5
         assert len(hex1.changing_lines) == 6
         assert len(hex1.commentary) >= 2
+
+    def test_adamblvck_extended_fields_when_data_present(self):
+        """When adamblvck dataset is loaded, hexagrams have judgment_text, changing_line_texts, pinyin, etc."""
+        enhanced = EnhancedIChing()
+        hex1 = enhanced.hexagrams[1]
+        # If adamblvck data/iching_wilhelm_translation.json exists, extended fields are set
+        if getattr(hex1, "judgment_text", None) is not None:
+            assert "sublime success" in hex1.judgment_text.lower() or "creative" in hex1.judgment_text.lower()
+            assert getattr(hex1, "changing_line_texts", None) is not None
+            assert hex1.changing_line_texts.get(1) == "Hidden dragon. Do not act."
+            assert getattr(hex1, "pinyin", None) == "qián"
+            assert getattr(hex1, "hex_unicode", None) == "䷀"
+        # Backward compat: combined judgment and changing_lines always present
+        assert hex1.judgment
+        assert len(hex1.changing_lines) == 6
     
     def test_adapter_backward_compatibility(self):
         """Test adapter maintains exact interface"""

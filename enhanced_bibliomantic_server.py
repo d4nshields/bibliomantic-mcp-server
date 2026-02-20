@@ -174,27 +174,39 @@ def get_hexagram_details(hexagram_number: int) -> str:
     if ENHANCED_MODE and hasattr(iching, 'enhanced_engine') and iching.enhanced_engine:
         hexagram = iching.enhanced_engine.hexagrams.get(hexagram_number)
         if hexagram:
+            symbol = getattr(hexagram, "hex_unicode", None) or hexagram.unicode_symbol
+            pinyin_line = f" (*Pinyin:* {hexagram.pinyin})\n\n" if getattr(hexagram, "pinyin", None) else "\n\n"
             response = f"""📖 **Hexagram {hexagram.number}: {hexagram.english_name}**
 
-*{hexagram.chinese_name} {hexagram.unicode_symbol}*
-
-**Judgment:** {hexagram.judgment}
-
-**Image:** {hexagram.image}
-
-**Traditional Interpretation:**
+*{hexagram.chinese_name} {symbol}*{pinyin_line}"""
+            if getattr(hexagram, "judgment_text", None):
+                response += f"**Judgment:** *{hexagram.judgment_text}*\n\n{hexagram.judgment_comments or ''}\n\n"
+            else:
+                response += f"**Judgment:** {hexagram.judgment}\n\n"
+            if getattr(hexagram, "image_text", None):
+                response += f"**Image:** *{hexagram.image_text}*\n\n{hexagram.image_comments or ''}\n\n"
+            else:
+                response += f"**Image:** {hexagram.image}\n\n"
+            if getattr(hexagram, "wilhelm_symbolic", None):
+                response += f"**Symbolic:** {hexagram.wilhelm_symbolic}\n\n"
+            response += f"""**Traditional Interpretation:**
 {hexagram.general_meaning}"""
 
-            # Add trigram information
+            # Add trigram information (include wilhelm above/below labels when available)
             upper_trigram = iching.enhanced_engine.trigrams.get(hexagram.upper_trigram)
             lower_trigram = iching.enhanced_engine.trigrams.get(hexagram.lower_trigram)
-            
             if upper_trigram and lower_trigram:
+                up_extra = ""
+                lo_extra = ""
+                if getattr(hexagram, "wilhelm_above", None) and isinstance(hexagram.wilhelm_above, dict):
+                    up_extra = f" — {hexagram.wilhelm_above.get('symbolic', '').rstrip(',')} {hexagram.wilhelm_above.get('alchemical', '')}"
+                if getattr(hexagram, "wilhelm_below", None) and isinstance(hexagram.wilhelm_below, dict):
+                    lo_extra = f" — {hexagram.wilhelm_below.get('symbolic', '').rstrip(',')} {hexagram.wilhelm_below.get('alchemical', '')}"
                 response += f"""
 
 **Trigram Composition:**
-• Upper: {upper_trigram.name} ({upper_trigram.chinese_name} {upper_trigram.unicode_symbol}) - {upper_trigram.attribute}
-• Lower: {lower_trigram.name} ({lower_trigram.chinese_name} {lower_trigram.unicode_symbol}) - {lower_trigram.attribute}"""
+• Upper: {upper_trigram.name} ({upper_trigram.chinese_name} {upper_trigram.unicode_symbol}) - {upper_trigram.attribute}{up_extra}
+• Lower: {lower_trigram.name} ({lower_trigram.chinese_name} {lower_trigram.unicode_symbol}) - {lower_trigram.attribute}{lo_extra}"""
 
             # Add commentary if available
             if hexagram.commentary.get('wilhelm'):
