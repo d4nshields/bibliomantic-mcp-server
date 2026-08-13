@@ -2,7 +2,7 @@
 
 ## High Level Summary in one line:
 
-Provides an Model-Context-Protocol server you LLM can call on any time it needs a randomly chosen chunk of wisdom from the I Ching in order to complete it's given task.
+Provides a Model-Context-Protocol server your AI Chat can call on any time it needs a randomly chosen chunk of chinese wisdom selected from the I Ching in order to complete it's given task.
 
 ## Original Terse Summary
 
