@@ -1,5 +1,11 @@
 # Bibliomantic MCP Server
 
+## High Level Summary in one line:
+
+Provides an Model-Context-Protocol server you LLM can call on any time it needs a randomly chosen chunk of wisdom from the I Ching in order to complete it's given task.
+
+## Original Terse Summary
+
 A Model Context Protocol server that integrates I Ching divination with AI responses, exploring the bibliomantic approach described in Philip K. Dick's *The Man in the High Castle*.
 
 ## Purpose
