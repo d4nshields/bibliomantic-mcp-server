@@ -199,8 +199,13 @@ An MCP configuration can then launch the server with Python:
 {
   "mcpServers": {
     "bibliomantic": {
-      "command": "python",
-      "args": ["-m", "bibliomantic_server"]
+      "command": "uv",
+      "args": [
+        "run",
+        "--github",
+        "d4nshields/bibliomantic-mcp-server",
+        "bibliomantic-server"
+      ]
     }
   }
 }
