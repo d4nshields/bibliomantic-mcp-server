@@ -14,7 +14,7 @@ Implement a modular enhanced data layer that provides rich traditional content w
 
 ### Architecture Components:
 
-1. **EnhancedIChing Class**: Core engine with complete traditional data
+1. **EnhancedIChing Class**: Core engine holding the hexagram data set; each entry records a `content_level` (`full`, `traditional` or `summary`) and `coverage_summary()` reports how much traditional text is authored so far
 2. **IChingAdapter**: Compatibility layer maintaining existing interface  
 3. **EnhancedBiblioManticDiviner**: Enhanced divination with backward compatibility
 4. **Enhanced Server**: Drop-in replacement for existing MCP server

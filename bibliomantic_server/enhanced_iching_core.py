@@ -36,6 +36,19 @@ class EnhancedHexagram:
     interpretations: Dict[str, str]  # context-specific interpretations
     changing_lines: Dict[int, str]  # line number -> interpretation
     commentary: Dict[str, str]  # different commentary sources
+    # How much authored traditional text this entry carries:
+    #   "full"        - Chinese name, judgment, image, changing lines, contextual texts and commentary
+    #   "traditional" - Chinese name, judgment and image; the rest derived from general_meaning
+    #   "summary"     - English name and general_meaning only
+    content_level: str = "summary"
+
+
+def placeholder_changing_lines(english_name: str) -> Dict[int, str]:
+    """Stand-in line texts for hexagrams whose traditional line texts are not yet included.
+
+    Must not start with "Line N:" - get_changing_line_guidance() adds that prefix.
+    """
+    return {i: f"Traditional changing-line text for {english_name} not yet included." for i in range(1, 7)}
 
 class EnhancedIChing:
     """Enhanced I Ching engine with rich traditional content"""
@@ -163,6 +176,7 @@ class EnhancedIChing:
         
         # Create enhanced hexagrams for the fully developed ones
         for num, (chinese_name, english_name, unicode_symbol, binary, upper_trigram, lower_trigram, judgment, image, general_meaning) in enhanced_data.items():
+            content_level = "full"
             if num == 1:
                 interpretations = {
                     "career": "Excellent time for leadership roles, starting new projects, or taking initiative. Your creative energy is at its peak. Consider proposing new ideas or seeking advancement opportunities.",
@@ -206,7 +220,8 @@ class EnhancedIChing:
                     "modern": "This hexagram counsels patience and supportive action. Sometimes the greatest strength lies in yielding and supporting others."
                 }
             else:
-                # Standard interpretations for other enhanced hexagrams
+                # Traditional judgment and image only; the rest is derived from the summary
+                content_level = "traditional"
                 interpretations = {
                     "career": f"{general_meaning} Applied to career situations.",
                     "relationships": f"{general_meaning} Applied to relationship dynamics.",
@@ -214,7 +229,7 @@ class EnhancedIChing:
                     "personal": f"{general_meaning} Applied to personal development.",
                     "business": f"{general_meaning} Applied to business decisions."
                 }
-                changing_lines = {i: f"Line {i}: Traditional changing line interpretation for {english_name}." for i in range(1, 7)}
+                changing_lines = placeholder_changing_lines(english_name)
                 commentary = {
                     "wilhelm": f"Traditional interpretation: {general_meaning}",
                     "modern": f"Contemporary application: {general_meaning}"
@@ -233,7 +248,8 @@ class EnhancedIChing:
                 general_meaning=general_meaning,
                 interpretations=interpretations,
                 changing_lines=changing_lines,
-                commentary=commentary
+                commentary=commentary,
+                content_level=content_level
             )
         
         # Create standard hexagrams for the rest
@@ -262,11 +278,12 @@ class EnhancedIChing:
                         "personal": f"{general_meaning} Applied to personal growth.",
                         "business": f"{general_meaning} Applied to business decisions."
                     },
-                    changing_lines={i: f"Line {i}: Traditional interpretation for changing line in {english_name}." for i in range(1, 7)},
+                    changing_lines=placeholder_changing_lines(english_name),
                     commentary={
                         "wilhelm": f"Traditional interpretation: {general_meaning}",
                         "modern": f"Contemporary application: {general_meaning}"
-                    }
+                    },
+                    content_level="summary"
                 )
         
         return hexagrams
@@ -289,6 +306,13 @@ class EnhancedIChing:
         lower_symbol = trigram_symbols.get(lower, "☰")
         return upper_symbol + lower_symbol
     
+    def coverage_summary(self) -> Dict[str, int]:
+        """Count hexagrams by content_level (see EnhancedHexagram) so the server can report true coverage."""
+        counts = {"total": len(self.hexagrams), "full": 0, "traditional": 0, "summary": 0}
+        for hexagram in self.hexagrams.values():
+            counts[hexagram.content_level] += 1
+        return counts
+
     def generate_enhanced_divination(self, query: Optional[str] = None) -> Dict[str, Any]:
         """Generate enhanced divination with changing lines"""
         coin_tosses = []

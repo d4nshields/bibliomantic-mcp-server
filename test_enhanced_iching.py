@@ -163,5 +163,35 @@ class TestPerformance:
         # Both should complete quickly
         assert original_time < 1.0
 
+@pytest.mark.skipif(not ENHANCED_AVAILABLE, reason="Enhanced features not available")
+class TestContentCoverage:
+    """The data set must describe itself truthfully and render line guidance cleanly"""
+
+    def test_changing_line_guidance_has_single_prefix(self):
+        """Regression: placeholder line texts once began with 'Line N:', giving 'Line N: Line N: ...'"""
+        import re
+        engine = EnhancedIChing()
+        for number in range(1, 65):
+            for guidance in engine.get_changing_line_guidance(number, [1, 2, 3, 4, 5, 6]):
+                assert re.fullmatch(r"Line [1-6]: (?!Line \d).+", guidance), f"hexagram {number}: {guidance!r}"
+
+    def test_coverage_summary_matches_data(self):
+        """content_level must agree with what each hexagram actually carries"""
+        engine = EnhancedIChing()
+        coverage = engine.coverage_summary()
+        assert coverage["total"] == 64
+        assert coverage["full"] + coverage["traditional"] + coverage["summary"] == 64
+        assert coverage["full"] >= 1  # at least hexagram 1 is fully authored
+        for hexagram in engine.hexagrams.values():
+            has_chinese_name = not hexagram.chinese_name.startswith("Hexagram ")
+            assert has_chinese_name == (hexagram.content_level in ("full", "traditional")), hexagram.number
+            is_placeholder = "not yet included" in hexagram.changing_lines[1]
+            assert is_placeholder == (hexagram.content_level != "full"), hexagram.number
+
+    def test_statistics_report_coverage(self):
+        """Server statistics must carry the live coverage counts, not a hardcoded claim"""
+        stats = EnhancedBiblioManticDiviner(use_enhanced=True).get_divination_statistics()
+        assert stats["content_coverage"] == EnhancedIChing().coverage_summary()
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

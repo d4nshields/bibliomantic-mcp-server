@@ -183,7 +183,7 @@ They should not be interpreted as endorsements of the *I Ching* as a source of p
 Choose one of the methods below to connect the Bibliomantic server to your MCP host (such as Claude Desktop).
 
 ### Option 1: Modern & Automatic (Recommended)
-If you have [uv](https://github.com/astral-sh/uv) installed, you do not need to clone or manually install anything. You can run the server directly from GitHub. 
+If you have [uv](https://github.com/astral-sh/uv) installed, you do not need to clone or manually install anything. `uvx` fetches the package from GitHub, installs it into a cached environment and runs the `bibliomantic-mcp-server` entry point.
 
 Add the following to your `claude_desktop_config.json`:
 
@@ -191,11 +191,10 @@ Add the following to your `claude_desktop_config.json`:
 {
   "mcpServers": {
     "bibliomantic": {
-      "command": "uv",
+      "command": "uvx",
       "args": [
-        "run",
-        "--github",
-        "d4nshields/bibliomantic-mcp-server",
+        "--from",
+        "git+https://github.com/d4nshields/bibliomantic-mcp-server",
         "bibliomantic-mcp-server"
       ]
     }
@@ -203,13 +202,15 @@ Add the following to your `claude_desktop_config.json`:
 }
 ```
 
+To pin to a specific commit instead of following `main`, append `@<commit-sha>` to the URL, e.g. `git+https://github.com/d4nshields/bibliomantic-mcp-server@44a2bdc`.
+
 ## ⚠️ Security & Supply Chain Notice
 
 Model Context Protocol (MCP) servers run with local system permissions granted by your AI host (like Claude Desktop). Running servers directly from remote sources introduces security risks. 
 
 Before installing or running *any* MCP server:
 1. **Audit the Source:** Review the codebase to ensure it contains no malicious scripts or unexpected network behaviors.
-2. **Understand the Risk of Direct Remote Execution:** Using tools like `uv run --github` means you are executing the latest code directly from the web. If a repository is compromised, malicious code could execute on your machine.
+2. **Understand the Risk of Direct Remote Execution:** Using tools like `uvx --from git+https://...` means you are executing the latest code directly from the web. If a repository is compromised, malicious code could execute on your machine.
 3. **Use Content Hashes/Pins:** For maximum security, pin your configurations to specific git commit hashes rather than floating branches like `main`.
 
 

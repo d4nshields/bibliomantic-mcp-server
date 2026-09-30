@@ -13,6 +13,8 @@ from typing import Optional
 # Import the official MCP server framework
 from mcp.server.mcpserver import MCPServer, Context
 
+from . import MCP_SDK_VERSION, MCP_LATEST_PROTOCOL_VERSION
+
 # Import enhanced components (with fallback)
 try:
     from .enhanced_divination import EnhancedBiblioManticDiviner
@@ -57,6 +59,18 @@ ETHICAL_DISCLAIMER = """
 BRIEF_DISCLAIMER = """
 ⚠️ *For reflection and entertainment only. Not for important life decisions.*
 """
+
+
+def _coverage_lines(coverage: dict) -> str:
+    """Bullet list stating how much authored traditional text the data set carries."""
+    total = coverage["total"]
+    traditional = coverage["full"] + coverage["traditional"]
+    return (
+        f"- Total Hexagrams: {total} (all with English names, Unicode symbols, trigram analysis and a summary interpretation)\n"
+        f"- Traditional Chinese names, judgment and image texts: {traditional} of {total}\n"
+        f"- Authored changing-line, contextual and commentary texts: {coverage['full']} of {total} "
+        f"(the rest derive these from the summary until their traditional texts are added)"
+    )
 
 @mcp.tool()
 def i_ching_divination(query: Optional[str] = None) -> str:
@@ -294,8 +308,10 @@ Note: This represents traditional wisdom for contemplation, not supernatural pre
 def get_iching_database() -> str:
     """Enhanced I Ching database resource"""
     hexagram_list = []
+    coverage_lines = "- Total Hexagrams: 64"
     
     if ENHANCED_MODE and hasattr(iching, 'enhanced_engine') and iching.enhanced_engine:
+        coverage_lines = _coverage_lines(iching.enhanced_engine.coverage_summary())
         for i in range(1, 65):
             hexagram = iching.enhanced_engine.hexagrams.get(i)
             if hexagram:
@@ -314,11 +330,8 @@ Educational Overview: The Book of Changes (I Ching) contains 64 hexagrams repres
 {chr(10).join(hexagram_list)}
 
 Enhanced System Information:
-- Total Hexagrams: 64 (with traditional Chinese names and Unicode symbols)
-- Changing Lines: Full traditional interpretations included
-- Trigram Analysis: Complete eight trigram system with attributes
+{coverage_lines}
 - Contextual Interpretations: Career, relationships, creative, business, personal
-- Commentary: Traditional and modern perspectives
 - Historical Origin: Ancient China (Zhou Dynasty, ~1000 BCE)
 - Philosophical Basis: Yin-Yang cosmology and patterns of change
 - Modern Implementation: Cryptographically secure randomness simulation
@@ -393,17 +406,14 @@ def server_statistics() -> str:
     stats = diviner.get_divination_statistics()
     
     enhanced_features = ""
-    if ENHANCED_MODE:
-        enhanced_features = """
+    if ENHANCED_MODE and "content_coverage" in stats:
+        enhanced_features = f"""
 **Enhanced Features:**
-- Traditional Chinese names and Unicode symbols
-- Complete judgment and image texts  
-- Changing line interpretations
-- Trigram analysis and interactions
-- Contextual interpretations (career, relationships, creative, business, personal)
-- Traditional and modern commentary
-- King Wen sequence binary mapping
-- Context-aware query analysis"""
+- Trigram analysis and King Wen sequence binary mapping
+- Context-aware query analysis (career, relationships, creative, business, personal)
+
+**Content Coverage:**
+{_coverage_lines(stats["content_coverage"])}"""
     
     return f"""📊 **Enhanced Bibliomantic Server Statistics**
 
@@ -417,7 +427,7 @@ def server_statistics() -> str:
 **Server Capabilities:**
 - Enhanced I Ching Divination (traditional three-coin method with changing lines)
 - Rich Bibliomantic Consultation (Philip K. Dick approach with full traditional elements)
-- Complete Hexagram Details (all 64 with Chinese names and Unicode symbols)
+- Hexagram Details (all 64; see Content Coverage for how much traditional text each carries)
 - Enhanced Resource Access (hexagram database with traditional content)
 - Contextual Prompt Templates (career, creative, and general guidance)
 
@@ -427,8 +437,8 @@ def server_statistics() -> str:
 - No supernatural or predictive claims made
 - Users guided toward professional consultation for important decisions
 
-**Framework:** MCPServer (Official MCP Python SDK)
-**Protocol Version:** MCP 2024-11-05
+**Framework:** MCPServer (Official MCP Python SDK {MCP_SDK_VERSION})
+**Protocol Version:** up to MCP {MCP_LATEST_PROTOCOL_VERSION} (negotiated per client)
 **Transport:** Standard I/O (stdio)
 
 **Historical Context:**
@@ -437,8 +447,8 @@ Philip K. Dick's "The Man in the High Castle", combining authentic traditional I
 wisdom with modern AI capabilities for deep philosophical exploration and creative reflection.
 
 **Quality Enhancement:**
-Traditional interpretations now include judgment, image, changing lines, trigram analysis,
-contextual guidance, and multiple commentary perspectives for authentic I Ching experience."""
+Traditional judgment, image, changing-line and commentary texts are being added hexagram by
+hexagram; Content Coverage above reflects the current data set."""
 
 if __name__ == "__main__":
     logger.info("Starting Enhanced Bibliomantic MCP Server")

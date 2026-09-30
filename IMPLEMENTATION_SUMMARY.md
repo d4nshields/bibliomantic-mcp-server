@@ -9,7 +9,7 @@ The Bibliomantic MCP Server is a Model Context Protocol implementation that inte
 ### Core Components
 
 **I Ching System (`bibliomantic_server/iching.py`)**
-- Complete 64-hexagram database with traditional names and interpretations
+- 64-hexagram database: English names, Unicode symbols and summary interpretations for all; traditional Chinese texts for a growing subset (`server_statistics` reports live counts)
 - Three-coin method simulation using cryptographically secure randomness
 - Flexible hexagram generation with proper yin/yang line creation
 - Formatted output optimized for AI integration

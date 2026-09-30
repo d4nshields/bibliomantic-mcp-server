@@ -16,6 +16,8 @@ from typing import Optional
 # Import the official MCP server framework
 from mcp.server.mcpserver import MCPServer
 
+from . import MCP_SDK_VERSION, MCP_LATEST_PROTOCOL_VERSION
+
 # Import our bibliomantic components
 from .divination import BiblioManticDiviner
 from .iching import IChing
@@ -346,8 +348,8 @@ def server_statistics() -> str:
 - Resource Access (hexagram database and individual entries)
 - Prompt Templates (career, creative, and general guidance)
 
-**Framework:** MCPServer (Official MCP Python SDK)
-**Protocol Version:** MCP 2024-11-05
+**Framework:** MCPServer (Official MCP Python SDK {MCP_SDK_VERSION})
+**Protocol Version:** up to MCP {MCP_LATEST_PROTOCOL_VERSION} (negotiated per client)
 **Transport:** Standard I/O (stdio)
 
 **Historical Context:**

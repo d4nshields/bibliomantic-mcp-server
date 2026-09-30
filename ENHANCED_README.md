@@ -36,11 +36,10 @@ Trigram Analysis:
 
 ## 🚀 Key Improvements
 
-1. **Traditional Authenticity**
-   - Chinese names (乾, 坤, etc.)
-   - Unicode symbols (☰☰, ☷☷, etc.)  
-   - Complete judgment and image texts
-   - Changing line interpretations
+1. **Traditional Authenticity** (coverage is still being filled in — `server_statistics` reports live counts)
+   - Unicode symbols (☰☰, ☷☷, etc.) and trigram analysis for all 64 hexagrams
+   - Chinese names with traditional judgment and image texts for hexagrams 1, 2, 11 and 63
+   - Authored changing-line texts for hexagrams 1 and 2; the others carry a placeholder until their texts are added
 
 2. **Contextual Intelligence**
    - Career-specific guidance
@@ -58,7 +57,7 @@ Trigram Analysis:
 - **Zero Breaking Changes**: All existing MCP tool signatures unchanged
 - **Backward Compatibility**: Enhanced features are additive only
 - **Production Safety**: Graceful fallback to basic mode
-- **Easy Rollback**: Original files backed up in `backup_original/`
+- **Easy Rollback**: every previous state is in git history
 
 ## 🏗️ Files Added
 
@@ -92,13 +91,8 @@ Your existing MCP agents should work unchanged but with dramatically richer cont
 If any issues occur:
 
 ```bash
-# Restore original files
-cp backup_original/* .
-
-# Switch back to main branch
-git checkout main
-
-# Restart with original server
+# Check out the last known-good commit (git log to find it), then restart the server
+git checkout <commit>
 python -m bibliomantic_server
 ```
 

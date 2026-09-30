@@ -90,15 +90,14 @@ Traditional Commentary: The Creative principle is represented by heaven, which e
 - ✅ **100% Backward Compatibility**: All existing MCP tools work unchanged
 - ✅ **Automatic Fallback**: If enhanced features fail, gracefully falls back to original
 - ✅ **Zero Configuration Changes**: Your Claude Desktop config works unchanged  
-- ✅ **Easy Rollback**: Original files backed up in `backup_original/`
+- ✅ **Easy Rollback**: every previous state is in git history
 
 ## 🎯 **Enhanced Features Now Available**
 
-### **Traditional Authenticity**
-- Chinese names (乾, 坤, 泰, 既濟)
-- Unicode trigram symbols (☰☰, ☷☷, ☷☰, ☵☲)
-- Complete traditional judgment and image texts
-- Proper changing line interpretations
+### **Traditional Authenticity** (partial — `server_statistics` reports live coverage)
+- Unicode trigram symbols and trigram analysis for all 64 hexagrams
+- Chinese names (乾, 坤, 泰, 既濟) with traditional judgment and image texts for hexagrams 1, 2, 11 and 63
+- Authored changing-line texts for hexagrams 1 and 2; placeholders for the rest until their texts are added
 
 ### **Modern Intelligence**
 - Context-aware interpretations (career, relationships, creative, business, personal)
@@ -122,13 +121,12 @@ Traditional Commentary: The Creative principle is represented by heaven, which e
 
 ### **Modified Files:**
 - ✅ `bibliomantic_server/main.py` - Updated to use enhanced server automatically
-- ✅ `backup_original/` - All original files safely preserved
 
 ## 🎉 **Ready to Launch!**
 
-Your I Ching server now provides authentic traditional wisdom with:
-- **3000+ year old traditional texts** properly implemented
-- **Rich contextual guidance** for modern life situations  
+Your I Ching server now provides:
+- **Traditional judgment and image texts** for a growing subset of hexagrams (see coverage above)
+- **Contextual guidance** for modern life situations (authored for hexagrams 1 and 2, derived from the summary elsewhere)
 - **Proper changing line methodology** for dynamic readings
 - **Complete trigram system** with traditional attributes
 - **Multiple commentary perspectives** for deeper understanding

@@ -224,14 +224,16 @@ class EnhancedBiblioManticDiviner:
             "system_status": "operational"
         }
         
-        if self.use_enhanced:
+        if self.use_enhanced and self.enhanced_engine:
             base_stats.update({
                 "enhanced_features": True,
                 "changing_lines": True,
                 "trigram_analysis": True,
                 "contextual_interpretations": True,
                 "traditional_commentaries": True,
-                "unicode_symbols": True
+                "unicode_symbols": True,
+                # How many hexagrams carry authored traditional text (see EnhancedHexagram.content_level)
+                "content_coverage": self.enhanced_engine.coverage_summary()
             })
         
         return base_stats

@@ -117,20 +117,17 @@ Your Claude agent will work unchanged but receive dramatically richer content!
 
 ### Easy Rollback Available
 ```bash
-# If any issues, restore original files
-cp backup_original/* .
-
-# Or switch back to main branch
-git checkout main
+# If any issues, check out the last known-good commit (git log to find it)
+git checkout <commit>
 ```
 
 ## 🎉 What You Now Have
 
 ### Traditional Authenticity
-- **Chinese Names**: 乾, 坤, 震, 巽, 坎, 離, 艮, 兌
-- **Unicode Symbols**: ☰☰, ☷☷, ☳☱, ☴☶, etc.
-- **Complete Texts**: Traditional judgment and image for all 64 hexagrams
-- **Changing Lines**: Proper three-coin method with line-specific guidance
+- **Trigrams**: all eight with Chinese names (乾, 坤, 震, 巽, 坎, 離, 艮, 兌), symbols and attributes
+- **Unicode Symbols**: ☰☰, ☷☷, ☳☱, ☴☶, etc. for all 64 hexagrams
+- **Traditional Texts**: Chinese name, judgment and image for hexagrams 1, 2, 11 and 63 so far; the other 60 carry an English name and summary interpretation (`server_statistics` reports live counts)
+- **Changing Lines**: Three-coin method with resulting-hexagram calculation for all 64; authored line-by-line texts for hexagrams 1 and 2, placeholders elsewhere
 
 ### Modern Intelligence  
 - **Context Awareness**: Career, relationship, creative, business, personal guidance
