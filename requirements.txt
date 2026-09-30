@@ -2,7 +2,7 @@
 
 # Official MCP Python SDK with CLI tools for development and deployment
 # Requires Python 3.10+ as per MCP SDK requirements
-mcp[cli]>=1.9.0
+mcp[cli]>=2.2.0,<3.0.0
 
 # Development and testing (optional)
 pytest>=7.4.3
