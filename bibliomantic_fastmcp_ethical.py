@@ -11,7 +11,7 @@ import sys
 from typing import Optional
 
 # Import the official FastMCP framework
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer, Context
 
 # Import our bibliomantic components
 try:
@@ -33,7 +33,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Create the FastMCP server with dependencies
-mcp = FastMCP(
+mcp = MCPServer(
     name="Bibliomantic Oracle",
     dependencies=["secrets"]  # For cryptographically secure randomness
 )

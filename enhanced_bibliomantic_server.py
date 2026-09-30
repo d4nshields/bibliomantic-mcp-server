@@ -11,7 +11,7 @@ import os
 from typing import Optional
 
 # Import the official FastMCP framework
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer, Context
 
 # Import enhanced components (with fallback)
 try:
@@ -34,7 +34,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Create the FastMCP server
-mcp = FastMCP(
+mcp = MCPServer(
     name="Enhanced Bibliomantic Oracle",
     dependencies=["secrets"]
 )

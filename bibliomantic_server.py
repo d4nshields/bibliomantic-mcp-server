@@ -32,9 +32,9 @@ except ImportError as e:
         logger.info("Loaded original Bibliomantic MCP Server in compatibility mode")
     except ImportError as fallback_error:
         logger.error(f"Failed to load any server: {fallback_error}")
-        # Create a minimal error server to prevent import failure
-        from mcp.server.fastmcp import FastMCP
-        mcp = FastMCP(name="Bibliomantic Oracle - Error State")
+        # Create a minimal error server to prevent import failure using v2.x architecture
+        from mcp.server.mcpserver import MCPServer
+        mcp = MCPServer("Bibliomantic Oracle - Error State")
         
         @mcp.tool()
         def server_error() -> str:
