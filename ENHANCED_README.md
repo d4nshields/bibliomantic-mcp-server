@@ -62,15 +62,15 @@ Trigram Analysis:
 
 ## 🏗️ Files Added
 
-- `enhanced_iching_core.py` - Rich traditional I Ching data layer
-- `enhanced_divination.py` - Enhanced divination with compatibility
-- `enhanced_bibliomantic_server.py` - Drop-in server replacement
+- `bibliomantic_server/enhanced_iching_core.py` - Rich traditional I Ching data layer
+- `bibliomantic_server/enhanced_divination.py` - Enhanced divination with compatibility
+- `bibliomantic_server/enhanced_bibliomantic_server.py` - Drop-in server replacement
 - `test_enhanced_iching.py` - Comprehensive test suite
 - `docs/` - Architecture decision records
 
 ## 🔧 Files Modified
 
-- `run_server.py` - Updated to use enhanced server with fallback
+- `bibliomantic_server/main.py` - Entry point; loads the enhanced server with fallback
 
 ## 📋 Testing & Deployment
 
@@ -81,7 +81,7 @@ python test_enhanced_iching.py
 
 ### Start Enhanced Server
 ```bash
-python run_server.py
+python -m bibliomantic_server
 ```
 
 ### Verify Existing Agents
@@ -99,7 +99,7 @@ cp backup_original/* .
 git checkout main
 
 # Restart with original server
-python run_server.py
+python -m bibliomantic_server
 ```
 
 ## 📈 Performance

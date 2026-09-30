@@ -8,10 +8,7 @@ with user queries, following the bibliomantic approach described in Philip K. Di
 
 import logging
 from typing import Optional, Tuple
-try:
-    from .iching import IChing, divine_hexagram
-except ImportError:
-    from iching import IChing, divine_hexagram
+from .iching import IChing, divine_hexagram
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

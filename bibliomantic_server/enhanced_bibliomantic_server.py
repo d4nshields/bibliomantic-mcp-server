@@ -10,18 +10,18 @@ import sys
 import os
 from typing import Optional
 
-# Import the official FastMCP framework
+# Import the official MCP server framework
 from mcp.server.mcpserver import MCPServer, Context
 
 # Import enhanced components (with fallback)
 try:
-    from enhanced_divination import EnhancedBiblioManticDiviner
-    from enhanced_iching_core import IChingAdapter
+    from .enhanced_divination import EnhancedBiblioManticDiviner
+    from .enhanced_iching_core import IChingAdapter
     ENHANCED_MODE = True
 except ImportError:
     # Fallback to original implementation
-    from divination import BiblioManticDiviner as EnhancedBiblioManticDiviner
-    from iching import IChing as IChingAdapter
+    from .divination import BiblioManticDiviner as EnhancedBiblioManticDiviner
+    from .iching import IChing as IChingAdapter
     ENHANCED_MODE = False
     print("Running in compatibility mode", file=sys.stderr)
 
@@ -33,7 +33,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Create the FastMCP server
+# Create the MCP server
 mcp = MCPServer(
     name="Enhanced Bibliomantic Oracle",
     dependencies=["secrets"]
@@ -43,11 +43,11 @@ mcp = MCPServer(
 if ENHANCED_MODE:
     diviner = EnhancedBiblioManticDiviner(use_enhanced=True)
     iching = IChingAdapter(use_enhanced=True)
-    logger.info("Enhanced Bibliomantic FastMCP Server initialized with full traditional content")
+    logger.info("Enhanced Bibliomantic MCP Server initialized with full traditional content")
 else:
     diviner = EnhancedBiblioManticDiviner()
     iching = IChingAdapter()
-    logger.info("Bibliomantic FastMCP Server initialized in compatibility mode")
+    logger.info("Bibliomantic MCP Server initialized in compatibility mode")
 
 # Ethical disclaimers (unchanged)
 ETHICAL_DISCLAIMER = """
@@ -427,7 +427,7 @@ def server_statistics() -> str:
 - No supernatural or predictive claims made
 - Users guided toward professional consultation for important decisions
 
-**Framework:** FastMCP (Official MCP Python SDK)
+**Framework:** MCPServer (Official MCP Python SDK)
 **Protocol Version:** MCP 2024-11-05
 **Transport:** Standard I/O (stdio)
 
@@ -441,5 +441,5 @@ Traditional interpretations now include judgment, image, changing lines, trigram
 contextual guidance, and multiple commentary perspectives for authentic I Ching experience."""
 
 if __name__ == "__main__":
-    logger.info("Starting Enhanced Bibliomantic FastMCP Server")
+    logger.info("Starting Enhanced Bibliomantic MCP Server")
     mcp.run()

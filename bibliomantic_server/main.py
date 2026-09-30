@@ -23,12 +23,12 @@ logger = logging.getLogger(__name__)
 
 # Try to import enhanced server first, fall back to original
 try:
-    from enhanced_bibliomantic_server import mcp
+    from .enhanced_bibliomantic_server import mcp
     logger.info("Loaded Enhanced Bibliomantic MCP Server with traditional I Ching content")
 except ImportError as e:
     logger.warning(f"Enhanced server not available ({e}), falling back to original server")
     try:
-        from bibliomantic_fastmcp_ethical import mcp
+        from .ethical_server import mcp
         logger.info("Loaded original Bibliomantic MCP Server in compatibility mode")
     except ImportError as fallback_error:
         logger.error(f"Failed to load any server: {fallback_error}")

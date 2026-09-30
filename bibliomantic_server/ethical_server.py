@@ -10,21 +10,14 @@ import logging
 import sys
 from typing import Optional
 
-# Import the official FastMCP framework
+# Import the official MCP server framework
 from mcp.server.mcpserver import MCPServer, Context
 
 # Import our bibliomantic components
-try:
-    from divination import BiblioManticDiviner
-    from iching import IChing
-except ImportError:
-    # Fallback for direct execution
-    import os
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from divination import BiblioManticDiviner
-    from iching import IChing
+from .divination import BiblioManticDiviner
+from .iching import IChing
 
-# Configure logging to stderr (FastMCP handles stdout for protocol)
+# Configure logging to stderr (MCPServer handles stdout for protocol)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -32,7 +25,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Create the FastMCP server with dependencies
+# Create the MCP server with dependencies
 mcp = MCPServer(
     name="Bibliomantic Oracle",
     dependencies=["secrets"]  # For cryptographically secure randomness
@@ -42,7 +35,7 @@ mcp = MCPServer(
 diviner = BiblioManticDiviner()
 iching = IChing()
 
-logger.info("Bibliomantic FastMCP Server initialized with ethical safeguards")
+logger.info("Bibliomantic MCP Server initialized with ethical safeguards")
 
 # Ethical disclaimer that appears in user-facing responses
 ETHICAL_DISCLAIMER = """
@@ -380,7 +373,7 @@ def server_statistics() -> str:
 - No supernatural or predictive claims made
 - Users guided toward professional consultation for important decisions
 
-**Framework:** FastMCP (Official MCP Python SDK)
+**Framework:** MCPServer (Official MCP Python SDK)
 **Protocol Version:** MCP 2024-11-05
 **Transport:** Standard I/O (stdio)
 
@@ -392,6 +385,6 @@ and creative reflection."""
 
 
 if __name__ == "__main__":
-    # FastMCP handles all the complex server setup automatically
-    logger.info("Starting Bibliomantic FastMCP Server with ethical safeguards")
+    # MCPServer handles all the complex server setup automatically
+    logger.info("Starting Bibliomantic MCP Server with ethical safeguards")
     mcp.run()

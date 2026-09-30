@@ -7,14 +7,21 @@ import sys
 import traceback
 from pathlib import Path
 
+# Windows consoles default to cp1252, which cannot encode the status emoji below.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, OSError):
+        pass
+
 def test_server_loading():
     """Test that the enhanced server can be imported and runs"""
     print("🔍 Testing Enhanced I Ching Server Loading")
     print("=" * 50)
     
     try:
-        print("1. Testing bibliomantic_server import...")
-        import bibliomantic_server
+        print("1. Testing bibliomantic_server.main import...")
+        from bibliomantic_server import main as bibliomantic_server
         
         if hasattr(bibliomantic_server, 'mcp'):
             print("✅ bibliomantic_server imported successfully")
@@ -31,7 +38,7 @@ def test_server_loading():
     
     try:
         print("\n2. Testing enhanced core components...")
-        from enhanced_iching_core import EnhancedIChing, IChingAdapter
+        from bibliomantic_server.enhanced_iching_core import EnhancedIChing, IChingAdapter
         
         # Test engine creation
         engine = EnhancedIChing()

@@ -43,10 +43,10 @@ python test_server_loading.py
   "args": [
     "run",
     "--with",
-    "mcp[cli]",
+    "mcp[cli]>=2.2.0,<3.0.0",
     "mcp",
     "run",
-    "/home/daniel/work/divination/bibliomantic_server.py"
+    "/home/daniel/work/divination/bibliomantic_server/main.py"
   ]
 }
 ```
@@ -115,13 +115,13 @@ Traditional Commentary: The Creative principle is represented by heaven, which e
 ## 📁 **Files Created/Modified**
 
 ### **New Enhancement Files:**
-- ✅ `enhanced_iching_core.py` - Rich traditional I Ching data layer (64 hexagrams)
-- ✅ `enhanced_divination.py` - Enhanced divination with backward compatibility
-- ✅ `enhanced_bibliomantic_server.py` - Drop-in MCP server replacement
+- ✅ `bibliomantic_server/enhanced_iching_core.py` - Rich traditional I Ching data layer (64 hexagrams)
+- ✅ `bibliomantic_server/enhanced_divination.py` - Enhanced divination with backward compatibility
+- ✅ `bibliomantic_server/enhanced_bibliomantic_server.py` - Drop-in MCP server replacement
 - ✅ `test_server_loading.py` - Quick verification test
 
 ### **Modified Files:**
-- ✅ `bibliomantic_server.py` - Updated to use enhanced server automatically
+- ✅ `bibliomantic_server/main.py` - Updated to use enhanced server automatically
 - ✅ `backup_original/` - All original files safely preserved
 
 ## 🎉 **Ready to Launch!**

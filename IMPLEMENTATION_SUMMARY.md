@@ -8,20 +8,20 @@ The Bibliomantic MCP Server is a Model Context Protocol implementation that inte
 
 ### Core Components
 
-**I Ching System (`iching.py`)**
+**I Ching System (`bibliomantic_server/iching.py`)**
 - Complete 64-hexagram database with traditional names and interpretations
 - Three-coin method simulation using cryptographically secure randomness
 - Flexible hexagram generation with proper yin/yang line creation
 - Formatted output optimized for AI integration
 
-**Bibliomantic Logic (`divination.py`)**
+**Bibliomantic Logic (`bibliomantic_server/divination.py`)**
 - Query augmentation system that integrates I Ching wisdom with user questions
 - Input validation and comprehensive error handling
 - Metadata tracking for transparency in divination process
 - Graceful degradation when divination operations fail
 
-**FastMCP Server (`bibliomantic_fastmcp_ethical.py`)**
-- Official MCP SDK implementation using FastMCP framework
+**MCP Server (`bibliomantic_server/ethical_server.py`)**
+- Official MCP SDK implementation using the MCPServer framework
 - Tools for interactive divination and consultation functions
 - Resources for direct hexagram database access and AI context loading
 - Prompt templates for structured philosophical exploration
@@ -49,8 +49,8 @@ The Bibliomantic MCP Server is a Model Context Protocol implementation that inte
 ### Randomness Generation
 Uses Python's `secrets` module for cryptographically secure randomness to provide authentic bibliomantic authenticity while maintaining technical transparency.
 
-### FastMCP Framework Adoption
-Migrated from custom MCP implementation to official FastMCP framework for:
+### MCPServer Framework Adoption
+Migrated from custom MCP implementation to the official MCPServer framework (named FastMCP prior to mcp 2.0) for:
 - Professional protocol compliance
 - Automatic JSON schema generation
 - Built-in development tools (MCP Inspector)
@@ -67,11 +67,17 @@ Treats I Ching as philosophical tradition rather than supernatural system, provi
 
 ```
 bibliomantic-mcp-server/
-├── bibliomantic_fastmcp_ethical.py    # Main FastMCP server implementation
-├── bibliomantic_server.py             # Package entry point
-├── iching.py                          # I Ching hexagram database and logic
-├── divination.py                      # Bibliomantic divination system
-├── __init__.py                        # Package initialization
+├── bibliomantic_server/               # Installable package
+│   ├── __init__.py                    # Package initialization
+│   ├── __main__.py                    # `python -m bibliomantic_server`
+│   ├── main.py                        # Console-script entry point
+│   ├── enhanced_bibliomantic_server.py # Enhanced MCPServer server (preferred)
+│   ├── ethical_server.py              # Ethical MCPServer server (fallback)
+│   ├── server.py                      # Original MCPServer server
+│   ├── enhanced_iching_core.py        # Traditional I Ching data layer
+│   ├── enhanced_divination.py         # Enhanced divination system
+│   ├── iching.py                      # I Ching hexagram database and logic
+│   └── divination.py                  # Bibliomantic divination system
 ├── requirements.txt                   # Python dependencies
 ├── pyproject.toml                     # Modern Python packaging
 ├── LICENSE                           # MIT license
@@ -84,31 +90,31 @@ bibliomantic-mcp-server/
 ## Dependencies
 
 **Core Requirements**
-- `mcp[cli]>=1.9.0`: Official MCP Python SDK with CLI tools
-- Python 3.8+: For modern async/await support
+- `mcp[cli]>=2.2.0,<3.0.0`: Official MCP Python SDK with CLI tools
+- Python 3.10+: Required by the MCP SDK
 
 **Removed Dependencies**
-Previous custom implementation required FastAPI, uvicorn, httpx, and custom HTTP client infrastructure. FastMCP framework eliminates these dependencies.
+Previous custom implementation required FastAPI, uvicorn, httpx, and custom HTTP client infrastructure. The MCPServer framework eliminates these dependencies.
 
 ## Usage Patterns
 
 ### Installation Methods
 - `uvx bibliomantic-mcp-server`: Recommended installation method
 - `pip install bibliomantic-mcp-server`: Alternative installation
-- Direct execution: `python bibliomantic_server.py`
+- Direct execution: `python -m bibliomantic_server`
 
 ### Claude Desktop Integration
 Standard MCP server configuration with stdio transport for seamless integration with Claude Desktop and other MCP-compatible hosts.
 
 ### Development Workflow
-- `mcp dev bibliomantic_server.py`: Built-in MCP Inspector for testing
+- `mcp dev bibliomantic_server/main.py`: Built-in MCP Inspector for testing
 - Type-safe implementation with automatic schema validation
 - Professional error handling with proper MCP error responses
 
 ## Quality Assurance
 
 ### Testing Strategy
-- FastMCP migration verification ensures all components function correctly
+- MCPServer migration verification ensures all components function correctly
 - MCP Inspector provides interactive testing of tools, resources, and prompts
 - Type safety with automatic JSON schema generation prevents malformed requests
 

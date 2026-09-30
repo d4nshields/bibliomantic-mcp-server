@@ -5,10 +5,7 @@ Maintains backward compatibility while adding rich traditional content
 
 import logging
 from typing import Optional, Tuple, Dict, Any
-try:
-    from .enhanced_iching_core import IChingAdapter, EnhancedIChing
-except ImportError:
-    from enhanced_iching_core import IChingAdapter, EnhancedIChing
+from .enhanced_iching_core import IChingAdapter, EnhancedIChing
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Bibliomantic MCP Server using FastMCP
+Bibliomantic MCP Server using MCPServer
 
 A Model Context Protocol server that integrates I Ching divination with AI responses,
 following the bibliomantic approach described in Philip K. Dick's "The Man in the High Castle".
 
-This version uses the official MCP Python SDK's FastMCP framework for maximum simplicity
+This version uses the official MCP Python SDK's MCPServer framework for maximum simplicity
 and professional compliance with the MCP specification.
 """
 
@@ -13,21 +13,14 @@ import logging
 import sys
 from typing import Optional
 
-# Import the official FastMCP framework
-from mcp.server.fastmcp import FastMCP
+# Import the official MCP server framework
+from mcp.server.mcpserver import MCPServer
 
 # Import our bibliomantic components
-try:
-    from divination import BiblioManticDiviner
-    from iching import IChing
-except ImportError:
-    # Fallback for direct execution
-    import os
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from divination import BiblioManticDiviner
-    from iching import IChing
+from .divination import BiblioManticDiviner
+from .iching import IChing
 
-# Configure logging to stderr (FastMCP handles stdout for protocol)
+# Configure logging to stderr (MCPServer handles stdout for protocol)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -35,8 +28,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Create the FastMCP server with dependencies
-mcp = FastMCP(
+# Create the MCP server with dependencies
+mcp = MCPServer(
     name="Bibliomantic Oracle",
     dependencies=["secrets"]  # For cryptographically secure randomness
 )
@@ -45,7 +38,7 @@ mcp = FastMCP(
 diviner = BiblioManticDiviner()
 iching = IChing()
 
-logger.info("Bibliomantic FastMCP Server initialized")
+logger.info("Bibliomantic MCP Server initialized")
 
 
 @mcp.tool()
@@ -353,7 +346,7 @@ def server_statistics() -> str:
 - Resource Access (hexagram database and individual entries)
 - Prompt Templates (career, creative, and general guidance)
 
-**Framework:** FastMCP (Official MCP Python SDK)
+**Framework:** MCPServer (Official MCP Python SDK)
 **Protocol Version:** MCP 2024-11-05
 **Transport:** Standard I/O (stdio)
 
@@ -364,6 +357,6 @@ wisdom with modern AI capabilities for guided decision-making."""
 
 
 if __name__ == "__main__":
-    # FastMCP handles all the complex server setup automatically
-    logger.info("Starting Bibliomantic FastMCP Server")
+    # MCPServer handles all the complex server setup automatically
+    logger.info("Starting Bibliomantic MCP Server")
     mcp.run()

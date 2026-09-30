@@ -183,7 +183,7 @@ They should not be interpreted as endorsements of the *I Ching* as a source of p
 Choose one of the methods below to connect the Bibliomantic server to your MCP host (such as Claude Desktop).
 
 ### Option 1: Modern & Automatic (Recommended)
-If you have [uv](https://github.com) installed, you do not need to clone or manually install anything. You can run the server directly from GitHub. 
+If you have [uv](https://github.com/astral-sh/uv) installed, you do not need to clone or manually install anything. You can run the server directly from GitHub. 
 
 Add the following to your `claude_desktop_config.json`:
 
@@ -196,7 +196,7 @@ Add the following to your `claude_desktop_config.json`:
         "run",
         "--github",
         "d4nshields/bibliomantic-mcp-server",
-        "bibliomantic-server"
+        "bibliomantic-mcp-server"
       ]
     }
   }
@@ -220,7 +220,7 @@ If you prefer to run the server entirely on your local machine using standard I/
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com
+   git clone https://github.com/d4nshields/bibliomantic-mcp-server.git
    cd bibliomantic-mcp-server
    ```
 
@@ -366,7 +366,7 @@ If Philip K. Dick-style weirdness emerges from your LLM session, however, the so
 The project uses:
 
 * **Python**
-* **FastMCP**
+* **MCP Python SDK (`MCPServer`)**
 * **Model Context Protocol**
 * A complete 64-hexagram data set
 * Python's `secrets` module for external randomness
@@ -380,13 +380,13 @@ The server requires no external API to perform a consultation.
 ### Run locally
 
 ```bash
-python bibliomantic_server.py
+python -m bibliomantic_server
 ```
 
 ### MCP Inspector
 
 ```bash
-mcp dev bibliomantic_server.py
+mcp dev bibliomantic_server/main.py
 ```
 
 ## Security and Privacy

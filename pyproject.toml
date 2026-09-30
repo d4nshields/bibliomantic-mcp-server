@@ -36,10 +36,10 @@ Issues = "https://github.com/d4nshields/bibliomantic-mcp-server/issues"
 Documentation = "https://github.com/d4nshields/bibliomantic-mcp-server/blob/main/README.md"
 
 [project.scripts]
-bibliomantic-server = "bibliomantic_server:main"
+bibliomantic-mcp-server = "bibliomantic_server.main:main"
 
 [tool.setuptools]
-py-modules = ["bibliomantic_server", "bibliomantic_fastmcp", "bibliomantic_fastmcp_ethical", "enhanced_bibliomantic_server", "enhanced_divination", "enhanced_iching_core", "divination", "iching"]
+packages = ["bibliomantic_server"]
 
 [tool.setuptools.package-data]
-"*" = ["*.md", "*.txt", "*.json"]
+"bibliomantic_server" = ["*.md", "*.txt", "*.json"]

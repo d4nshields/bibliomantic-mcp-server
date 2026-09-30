@@ -7,10 +7,9 @@ All enhancements have been successfully applied to your bibliomantic MCP server!
 ## 📁 Files Created
 
 ### Core Enhancement Files
-- ✅ `enhanced_iching_core.py` - Rich traditional I Ching data layer with 64 enhanced hexagrams
-- ✅ `enhanced_divination.py` - Enhanced divination system with backward compatibility
-- ✅ `enhanced_bibliomantic_server.py` - Drop-in replacement MCP server
-- ✅ `migrate_to_enhanced.py` - Complete migration script
+- ✅ `bibliomantic_server/enhanced_iching_core.py` - Rich traditional I Ching data layer with 64 enhanced hexagrams
+- ✅ `bibliomantic_server/enhanced_divination.py` - Enhanced divination system with backward compatibility
+- ✅ `bibliomantic_server/enhanced_bibliomantic_server.py` - Drop-in replacement MCP server
 - ✅ `test_enhanced_iching.py` - Comprehensive test suite
 
 ### Documentation
@@ -81,17 +80,12 @@ The MCP server startup error has been resolved by fixing a circular import in th
 
 ## 🧪 Testing & Deployment
 
-### 1. Run the Migration Script
-```bash
-python migrate_to_enhanced.py
-```
-
-### 2. Run Tests to Verify Everything Works
+### 1. Run Tests to Verify Everything Works
 ```bash
 python test_enhanced_iching.py
 ```
 
-### 3. Your Existing Claude Desktop Config Works Unchanged!
+### 2. Your Existing Claude Desktop Config Works Unchanged!
 Your current configuration:
 ```json
 "Bibliomantic Oracle": {
@@ -99,10 +93,10 @@ Your current configuration:
   "args": [
     "run",
     "--with",
-    "mcp[cli]",
+    "mcp[cli]>=2.2.0,<3.0.0",
     "mcp",
     "run",
-    "/home/daniel/work/divination/bibliomantic_server.py"
+    "/home/daniel/work/divination/bibliomantic_server/main.py"
   ]
 }
 ```
@@ -156,7 +150,7 @@ Your bibliomantic MCP server now provides the depth and authenticity of traditio
 
 **Command to get started:**
 ```bash
-python run_server.py
+python -m bibliomantic_server
 ```
 
 Enjoy your dramatically enhanced I Ching experience! 🔮✨

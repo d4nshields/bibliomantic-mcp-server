@@ -14,15 +14,15 @@ project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
 try:
-    from enhanced_iching_core import IChingAdapter, EnhancedIChing
-    from enhanced_divination import EnhancedBiblioManticDiviner
+    from bibliomantic_server.enhanced_iching_core import IChingAdapter, EnhancedIChing
+    from bibliomantic_server.enhanced_divination import EnhancedBiblioManticDiviner
     ENHANCED_AVAILABLE = True
 except ImportError:
     ENHANCED_AVAILABLE = False
 
 # Always test original implementation
-from iching import IChing
-from divination import BiblioManticDiviner
+from bibliomantic_server.iching import IChing
+from bibliomantic_server.divination import BiblioManticDiviner
 
 class TestBackwardCompatibility:
     """Ensure zero breaking changes to existing functionality"""

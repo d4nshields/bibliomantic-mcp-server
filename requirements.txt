@@ -1,4 +1,4 @@
-# Bibliomantic MCP Server Dependencies - FastMCP Version
+# Bibliomantic MCP Server Dependencies - MCP 2.x (MCPServer) Version
 
 # Official MCP Python SDK with CLI tools for development and deployment
 # Requires Python 3.10+ as per MCP SDK requirements
