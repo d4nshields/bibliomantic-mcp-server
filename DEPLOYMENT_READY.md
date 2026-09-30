@@ -97,12 +97,13 @@ Traditional Commentary: The Creative principle is represented by heaven, which e
 ### **Traditional Authenticity** (partial — `server_statistics` reports live coverage)
 - Unicode trigram symbols and trigram analysis for all 64 hexagrams
 - Chinese names (乾, 坤, 泰, 既濟) with traditional judgment and image texts for hexagrams 1, 2, 11 and 63
-- Authored changing-line texts for hexagrams 1 and 2; placeholders for the rest until their texts are added
+- Authored changing-line texts for hexagrams 1 and 2; responses for the rest omit the
+  changing-line section and say so, rather than showing generated stand-in text
 
 ### **Modern Intelligence**
 - Context-aware interpretations (career, relationships, creative, business, personal)
 - Smart query analysis automatically detects domain
-- Rich commentary from multiple perspectives
+- Commentary from multiple perspectives where authored (hexagrams 1 and 2)
 - Trigram analysis with traditional attributes
 
 ### **Advanced Divination**
@@ -126,10 +127,11 @@ Traditional Commentary: The Creative principle is represented by heaven, which e
 
 Your I Ching server now provides:
 - **Traditional judgment and image texts** for a growing subset of hexagrams (see coverage above)
-- **Contextual guidance** for modern life situations (authored for hexagrams 1 and 2, derived from the summary elsewhere)
+- **Contextual guidance** for modern life situations (authored for hexagrams 1 and 2; elsewhere
+  the response falls back to the general summary instead of a synthesized per-context text)
 - **Proper changing line methodology** for dynamic readings
 - **Complete trigram system** with traditional attributes
-- **Multiple commentary perspectives** for deeper understanding
+- **Multiple commentary perspectives** for deeper understanding, where authored
 
 **All while maintaining perfect compatibility with your existing Claude agent!**
 

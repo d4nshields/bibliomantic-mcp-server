@@ -127,7 +127,7 @@ git checkout <commit>
 - **Trigrams**: all eight with Chinese names (乾, 坤, 震, 巽, 坎, 離, 艮, 兌), symbols and attributes
 - **Unicode Symbols**: ☰☰, ☷☷, ☳☱, ☴☶, etc. for all 64 hexagrams
 - **Traditional Texts**: Chinese name, judgment and image for hexagrams 1, 2, 11 and 63 so far; the other 60 carry an English name and summary interpretation (`server_statistics` reports live counts)
-- **Changing Lines**: Three-coin method with resulting-hexagram calculation for all 64; authored line-by-line texts for hexagrams 1 and 2, placeholders elsewhere
+- **Changing Lines**: Three-coin method with resulting-hexagram calculation for all 64; authored line-by-line texts for hexagrams 1 and 2. Elsewhere the line texts are omitted with a note instead of substituted
 
 ### Modern Intelligence  
 - **Context Awareness**: Career, relationship, creative, business, personal guidance

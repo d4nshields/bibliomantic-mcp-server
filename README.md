@@ -26,7 +26,7 @@ And, importantly, this project does **not** claim that the *I Ching* predicts th
 
 It provides:
 
-* Traditional 64-hexagram *I Ching* data
+* All 64 hexagrams, with traditional texts for a growing subset (see [Content Coverage](#content-coverage))
 * Three-coin divination simulation
 * Randomized bibliomantic context for LLM reasoning and writing
 * Individual hexagram lookup
@@ -146,6 +146,8 @@ Retrieves information about a particular *I Ching* hexagram by number.
 1–64
 ```
 
+How much traditional text comes back depends on the hexagram — see [Content Coverage](#content-coverage).
+
 ### `server_statistics`
 
 Returns information about the server and its available capabilities.
@@ -165,6 +167,27 @@ hexagram://1
 ### `iching://database`
 
 Provides access to the complete 64-hexagram database.
+
+## Content Coverage
+
+All 64 hexagrams carry an English name, Unicode symbol, trigram analysis and a summary
+interpretation. Authored traditional text is still being filled in, so entries fall into
+three tiers:
+
+| Tier | Hexagrams | What it carries |
+| --- | --- | --- |
+| `full` | 1, 2 | Chinese name, judgment, image, per-line texts, contextual readings and commentary |
+| `traditional` | 11, 63 | Chinese name, judgment and image |
+| `summary` | the other 60 | English name, Unicode symbol, trigrams and a summary interpretation |
+
+Where a traditional text has not been authored, **the server omits that section and says
+so** rather than substituting generated wording. A consultation on a `summary` hexagram
+therefore has no Judgment, Image or Traditional Commentary block, and its summary is
+labelled as an editorial paraphrase rather than a translation. Changing lines are still
+calculated for all 64 by the three-coin method; only the per-line *texts* are limited to
+the `full` tier.
+
+Call `server_statistics` for live counts — they are read from the data set, not hardcoded.
 
 ## Prompt Templates
 
@@ -369,7 +392,7 @@ The project uses:
 * **Python**
 * **MCP Python SDK (`MCPServer`)**
 * **Model Context Protocol**
-* A complete 64-hexagram data set
+* A 64-hexagram data set (traditional text coverage is partial and reported at runtime)
 * Python's `secrets` module for external randomness
 * Type hints and generated schemas
 * MCP tools, resources, and prompts

@@ -39,7 +39,8 @@ Trigram Analysis:
 1. **Traditional Authenticity** (coverage is still being filled in — `server_statistics` reports live counts)
    - Unicode symbols (☰☰, ☷☷, etc.) and trigram analysis for all 64 hexagrams
    - Chinese names with traditional judgment and image texts for hexagrams 1, 2, 11 and 63
-   - Authored changing-line texts for hexagrams 1 and 2; the others carry a placeholder until their texts are added
+   - Authored changing-line texts for hexagrams 1 and 2; for the others the changing-line
+     section is omitted with a note, rather than filled with generated stand-in text
 
 2. **Contextual Intelligence**
    - Career-specific guidance
