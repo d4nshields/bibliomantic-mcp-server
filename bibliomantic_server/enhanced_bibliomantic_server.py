@@ -45,7 +45,7 @@ mcp = MCPServer(
 if ENHANCED_MODE:
     diviner = EnhancedBiblioManticDiviner(use_enhanced=True)
     iching = IChingAdapter(use_enhanced=True)
-    logger.info("Enhanced Bibliomantic MCP Server initialized with full traditional content")
+    logger.info("Enhanced Bibliomantic MCP Server initialized (traditional text coverage varies by hexagram)")
 else:
     diviner = EnhancedBiblioManticDiviner()
     iching = IChingAdapter()
@@ -120,8 +120,9 @@ def i_ching_divination(query: Optional[str] = None) -> str:
 @mcp.tool()
 def bibliomantic_consultation(query: str) -> str:
     """
-    Enhanced bibliomantic consultation with full traditional I Ching elements.
-    DRAMATICALLY IMPROVED CONTENT while maintaining exact interface compatibility.
+    Enhanced bibliomantic consultation with traditional I Ching elements.
+    Depth of traditional text varies by hexagram; see the Content Coverage section
+    of the server info resource. Maintains exact interface compatibility.
     """
     logger.info("Performing enhanced bibliomantic consultation")
     
@@ -367,7 +368,7 @@ def creative_guidance_prompt(project: str) -> str:
     """Enhanced creative guidance prompt"""
     return f"""I'm working on this creative project: {project}
 
-Please perform an enhanced bibliomantic I Ching consultation to provide perspective on my creative work, following the literary approach described in Philip K. Dick's "The Man in the High Castle" but with full traditional elements.
+Please perform an enhanced bibliomantic I Ching consultation to provide perspective on my creative work, following the literary approach described in Philip K. Dick's "The Man in the High Castle", drawing on whatever traditional text the selected hexagram carries.
 
 I seek ancient wisdom patterns for contemplating:
 1. Creative direction and approach for this project with traditional I Ching judgment and image
@@ -376,7 +377,7 @@ I seek ancient wisdom patterns for contemplating:
 4. Context-specific creative interpretation
 5. How to align my creative process with natural change patterns
 
-Please generate a hexagram using the traditional three-coin method with Chinese names, Unicode symbols, and complete traditional commentary.
+Please generate a hexagram using the traditional three-coin method, including its Chinese name, Unicode symbol, and whatever traditional commentary the data set carries for it.
 
 I understand this is for philosophical exploration and creative inspiration, not supernatural guidance or professional advice."""
 
@@ -385,18 +386,18 @@ def general_guidance_prompt(question: str) -> str:
     """Enhanced general guidance prompt"""
     return f"""I have this question about my life path: {question}
 
-Please consult the enhanced I Ching oracle using the bibliomantic divination method, as described in Philip K. Dick's "The Man in the High Castle", to provide ancient wisdom patterns with full traditional elements for my modern situation.
+Please consult the enhanced I Ching oracle using the bibliomantic divination method, as described in Philip K. Dick's "The Man in the High Castle", to provide ancient wisdom patterns for my modern situation.
 
 I'm seeking philosophical perspectives through:
 1. A relevant I Ching hexagram with traditional Chinese name and Unicode symbol
-2. Complete traditional judgment and image interpretations
+2. Traditional judgment and image interpretations, where available for this hexagram
 3. Changing line analysis and guidance
 4. Trigram composition and symbolic meaning
 5. Contextual interpretation based on my question's domain
 6. Traditional commentary perspectives
 7. Understanding of timing and approach patterns for moving forward
 
-Please bridge the authentic oracle's wisdom patterns with my contemporary circumstances, using the complete traditional I Ching system to offer fresh perspectives.
+Please bridge the oracle's wisdom patterns with my contemporary circumstances to offer fresh perspectives. Where the traditional text for this hexagram is not yet included, say so rather than presenting substitute wording as traditional.
 
 Important: I understand this is for philosophical reflection and pattern exploration only. For important life decisions, I will consult qualified professionals in relevant fields."""
 
@@ -426,7 +427,7 @@ def server_statistics() -> str:
 
 **Server Capabilities:**
 - Enhanced I Ching Divination (traditional three-coin method with changing lines)
-- Rich Bibliomantic Consultation (Philip K. Dick approach with full traditional elements)
+- Bibliomantic Consultation (Philip K. Dick approach; traditional text depth varies by hexagram)
 - Hexagram Details (all 64; see Content Coverage for how much traditional text each carries)
 - Enhanced Resource Access (hexagram database with traditional content)
 - Contextual Prompt Templates (career, creative, and general guidance)

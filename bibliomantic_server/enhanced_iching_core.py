@@ -87,10 +87,10 @@ class EnhancedIChing:
         }
     
     def _load_hexagrams(self) -> Dict[int, EnhancedHexagram]:
-        """Load enhanced hexagram data with full traditional content"""
+        """Load hexagram data; see content_level for how much traditional text each entry carries."""
         hexagrams = {}
         
-        # Enhanced hexagrams with full traditional content
+        # Hexagram entries; content_level records how much authored traditional text each has
         enhanced_data = {
             1: ("乾", "The Creative", "☰☰", "111111", "heaven", "heaven",
                 "The Creative works sublime success, furthering through perseverance.",

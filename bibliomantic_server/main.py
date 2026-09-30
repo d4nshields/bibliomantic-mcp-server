@@ -4,7 +4,8 @@ Enhanced Bibliomantic MCP Server
 
 A Model Context Protocol server that integrates enhanced I Ching divination with AI responses,
 exploring the bibliomantic approach described in Philip K. Dick's "The Man in the High Castle"
-with full traditional Chinese I Ching elements.
+with traditional Chinese I Ching elements. How much authored traditional text each hexagram
+carries varies; the server info resource reports exact coverage.
 
 This is the main entry point for the enhanced server when invoked directly by Claude Desktop.
 Maintains backward compatibility with existing configurations.

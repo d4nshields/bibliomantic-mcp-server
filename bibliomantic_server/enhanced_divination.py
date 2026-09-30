@@ -131,7 +131,7 @@ class EnhancedBiblioManticDiviner:
             }
     
     def perform_enhanced_consultation(self, query: str) -> str:
-        """New enhanced consultation method with full traditional content"""
+        """New enhanced consultation method; traditional text depth varies by hexagram."""
         if not self.use_enhanced or not self.enhanced_engine:
             return "Enhanced mode not available"
         
@@ -143,7 +143,7 @@ class EnhancedBiblioManticDiviner:
             return f"Enhanced consultation failed: {str(e)}"
     
     def _format_enhanced_consultation(self, divination_result: Dict[str, Any], query: str) -> str:
-        """Format enhanced consultation with full traditional elements"""
+        """Format enhanced consultation with whatever traditional elements the hexagram carries."""
         hexagram = divination_result['primary_hexagram']
         changing_lines = divination_result.get('changing_lines', [])
         resulting_hexagram = divination_result.get('resulting_hexagram')
