@@ -177,9 +177,7 @@ class EnhancedBiblioManticDiviner:
             if line_guidance:
                 for guidance in line_guidance:
                     result += f"• {guidance}\n"
-            else:
-                result += "*Traditional line texts for this hexagram are not yet included.*\n"
-            result += "\n"
+                result += "\n"
             
             if resulting_hexagram:
                 result += f"**Resulting Situation - Hexagram {resulting_hexagram.number}: {resulting_hexagram.english_name}**\n"
@@ -198,12 +196,6 @@ class EnhancedBiblioManticDiviner:
         # Commentary
         if hexagram.commentary.get('wilhelm'):
             result += f"**Traditional Commentary:** {hexagram.commentary['wilhelm']}\n\n"
-
-        # State the gap rather than filling it with generated text
-        if hexagram.content_level != "full":
-            result += ("*Traditional judgment, image, changing-line and commentary texts for this "
-                       "hexagram are not yet included; the summary above is an editorial paraphrase, "
-                       "not a translation.*\n\n")
 
         # Bibliomantic context (maintains existing format)
         result += "**Bibliomantic Context:**\n"

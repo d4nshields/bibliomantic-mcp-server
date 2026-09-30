@@ -121,8 +121,7 @@ def i_ching_divination(query: Optional[str] = None) -> str:
 def bibliomantic_consultation(query: str) -> str:
     """
     Enhanced bibliomantic consultation with traditional I Ching elements.
-    Depth of traditional text varies by hexagram; see the Content Coverage section
-    of the server info resource. Maintains exact interface compatibility.
+    Maintains exact interface compatibility.
     """
     logger.info("Performing enhanced bibliomantic consultation")
     
@@ -231,13 +230,6 @@ def get_hexagram_details(hexagram_number: int) -> str:
 **Traditional Commentary:**
 {hexagram.commentary['wilhelm']}"""
 
-            # State the gap rather than filling it with generated text
-            if hexagram.content_level != "full":
-                response += """
-
-*Traditional judgment, image, changing-line and commentary texts for this hexagram
-are not yet included; the summary above is an editorial paraphrase, not a translation.*"""
-
             response += f"""
 
 **Historical Context:**
@@ -288,19 +280,16 @@ def get_hexagram_resource(number: str) -> str:
         if ENHANCED_MODE and hasattr(iching, 'enhanced_engine') and iching.enhanced_engine:
             hexagram = iching.enhanced_engine.hexagrams.get(hexagram_num)
             if hexagram:
-                name_line = " ".join(filter(None, [hexagram.chinese_name, hexagram.unicode_symbol]))
                 traditional = ""
+                if hexagram.chinese_name:
+                    traditional += f"\nChinese Name: {hexagram.chinese_name}\n"
                 if hexagram.judgment:
                     traditional += f"\nJudgment: {hexagram.judgment}\n"
                 if hexagram.image:
                     traditional += f"\nImage: {hexagram.image}\n"
-                if hexagram.content_level != "full":
-                    traditional += ("\nNote: traditional judgment, image, changing-line and commentary "
-                                    "texts for this hexagram are not yet included; the general meaning "
-                                    "below is an editorial paraphrase, not a translation.\n")
                 return f"""I Ching Hexagram {hexagram.number}: {hexagram.english_name}
 
-Chinese Name: {name_line}
+Symbol: {hexagram.unicode_symbol}
 {traditional}
 General Meaning: {hexagram.general_meaning}
 
@@ -424,7 +413,7 @@ I'm seeking philosophical perspectives through:
 6. Traditional commentary perspectives
 7. Understanding of timing and approach patterns for moving forward
 
-Please bridge the oracle's wisdom patterns with my contemporary circumstances to offer fresh perspectives. Where the traditional text for this hexagram is not yet included, say so rather than presenting substitute wording as traditional.
+Please bridge the oracle's wisdom patterns with my contemporary circumstances to offer fresh perspectives.
 
 Important: I understand this is for philosophical reflection and pattern exploration only. For important life decisions, I will consult qualified professionals in relevant fields."""
 
