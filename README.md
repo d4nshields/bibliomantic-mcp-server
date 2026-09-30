@@ -178,34 +178,74 @@ These templates provide examples of how an MCP client can incorporate bibliomant
 
 They should not be interpreted as endorsements of the *I Ching* as a source of professional or real-world advice.
 
-## Installation
+## Installation & Configuration
 
-### Requirements
+Choose one of the methods below to connect the Bibliomantic server to your MCP host (such as Claude Desktop).
 
-* Python 3.10+
-* An MCP-compatible host
+### Option 1: Modern & Automatic (Recommended)
+If you have [uv](https://github.com) installed, you do not need to clone or manually install anything. You can run the server directly from GitHub. 
 
-Clone the repository:
-
-```bash
-git clone https://github.com/d4nshields/bibliomantic-mcp-server.git
-cd bibliomantic-mcp-server
-pip install -e .
-```
-
-An MCP configuration can then launch the server with Python:
+Add the following to your `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "bibliomantic": {
-      "command": "python",
-      "args": ["-m", "bibliomantic_server"]
+      "command": "uv",
+      "args": [
+        "run",
+        "--github",
+        "d4nshields/bibliomantic-mcp-server",
+        "bibliomantic-server"
+      ]
     }
   }
 }
 ```
 
+## ⚠️ Security & Supply Chain Notice
+
+Model Context Protocol (MCP) servers run with local system permissions granted by your AI host (like Claude Desktop). Running servers directly from remote sources introduces security risks. 
+
+Before installing or running *any* MCP server:
+1. **Audit the Source:** Review the codebase to ensure it contains no malicious scripts or unexpected network behaviors.
+2. **Understand the Risk of Direct Remote Execution:** Using tools like `uv run --github` means you are executing the latest code directly from the web. If a repository is compromised, malicious code could execute on your machine.
+3. **Use Content Hashes/Pins:** For maximum security, pin your configurations to specific git commit hashes rather than floating branches like `main`.
+
+
+---
+
+### Option 2: Local STDIO Setup (Manual Environment)
+If you prefer to run the server entirely on your local machine using standard I/O (STDIO), follow these steps:
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com
+   cd bibliomantic-mcp-server
+   ```
+
+2. **Install the package:**
+   You can install it using `pip` (ideally within a virtual environment):
+   ```bash
+   pip install .
+   ```
+   *(Alternatively, use `pip install -r requirements.txt` if you prefer tracking individual dependencies.)*
+
+3. **Configure your host:**
+   Add the server to your local configuration file. Make sure to replace `path/to/your/python` with the actual path to your environment's Python executable:
+
+   ```json
+   {
+     "mcpServers": {
+       "bibliomantic": {
+         "command": "/path/to/your/python",
+         "args": ["-m", "bibliomantic_server"]
+       }
+     }
+   }
+   ```
+   
+   
 ## Example Usage
 
 ### Creative writing
