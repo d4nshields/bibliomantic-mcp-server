@@ -183,10 +183,28 @@ class TestContentCoverage:
         assert coverage["full"] + coverage["traditional"] + coverage["summary"] == 64
         assert coverage["full"] >= 1  # at least hexagram 1 is fully authored
         for hexagram in engine.hexagrams.values():
-            has_chinese_name = not hexagram.chinese_name.startswith("Hexagram ")
-            assert has_chinese_name == (hexagram.content_level in ("full", "traditional")), hexagram.number
-            is_placeholder = "not yet included" in hexagram.changing_lines[1]
-            assert is_placeholder == (hexagram.content_level != "full"), hexagram.number
+            traditional_tier = hexagram.content_level in ("full", "traditional")
+            # Chinese name, judgment and image exist exactly for the traditional tiers
+            assert bool(hexagram.chinese_name) == traditional_tier, hexagram.number
+            assert bool(hexagram.judgment) == traditional_tier, hexagram.number
+            assert bool(hexagram.image) == traditional_tier, hexagram.number
+            # Changing-line, contextual and commentary texts exist only where fully authored
+            fully_authored = hexagram.content_level == "full"
+            assert bool(hexagram.changing_lines) == fully_authored, hexagram.number
+            assert bool(hexagram.commentary) == fully_authored, hexagram.number
+            assert bool(hexagram.interpretations) == fully_authored, hexagram.number
+
+    def test_no_generated_text_presented_as_traditional(self):
+        """Nothing may be synthesized from general_meaning and served as traditional text"""
+        engine = EnhancedIChing()
+        for hexagram in engine.hexagrams.values():
+            summary = hexagram.general_meaning
+            for field in (hexagram.judgment, hexagram.image):
+                assert summary not in (field or ""), hexagram.number
+            for text in list(hexagram.commentary.values()) + list(hexagram.interpretations.values()):
+                assert summary not in text, hexagram.number
+            for text in hexagram.changing_lines.values():
+                assert "not yet included" not in text, hexagram.number
 
     def test_statistics_report_coverage(self):
         """Server statistics must carry the live coverage counts, not a hardcoded claim"""

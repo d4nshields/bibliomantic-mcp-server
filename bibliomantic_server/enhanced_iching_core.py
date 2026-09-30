@@ -38,17 +38,13 @@ class EnhancedHexagram:
     commentary: Dict[str, str]  # different commentary sources
     # How much authored traditional text this entry carries:
     #   "full"        - Chinese name, judgment, image, changing lines, contextual texts and commentary
-    #   "traditional" - Chinese name, judgment and image; the rest derived from general_meaning
-    #   "summary"     - English name and general_meaning only
+    #   "traditional" - Chinese name, judgment and image; line/contextual/commentary left empty
+    #   "summary"     - English name and general_meaning only; all traditional fields left empty
+    # Fields with no authored text stay empty rather than holding text derived from
+    # general_meaning, so nothing generated is ever served as traditional material.
     content_level: str = "summary"
 
 
-def placeholder_changing_lines(english_name: str) -> Dict[int, str]:
-    """Stand-in line texts for hexagrams whose traditional line texts are not yet included.
-
-    Must not start with "Line N:" - get_changing_line_guidance() adds that prefix.
-    """
-    return {i: f"Traditional changing-line text for {english_name} not yet included." for i in range(1, 7)}
 
 class EnhancedIChing:
     """Enhanced I Ching engine with rich traditional content"""
@@ -220,20 +216,13 @@ class EnhancedIChing:
                     "modern": "This hexagram counsels patience and supportive action. Sometimes the greatest strength lies in yielding and supporting others."
                 }
             else:
-                # Traditional judgment and image only; the rest is derived from the summary
+                # Traditional judgment and image only. Changing-line, contextual and
+                # commentary texts are left empty rather than synthesized from the
+                # summary, so callers are never shown generated text as traditional.
                 content_level = "traditional"
-                interpretations = {
-                    "career": f"{general_meaning} Applied to career situations.",
-                    "relationships": f"{general_meaning} Applied to relationship dynamics.",
-                    "creative": f"{general_meaning} Applied to creative endeavors.",
-                    "personal": f"{general_meaning} Applied to personal development.",
-                    "business": f"{general_meaning} Applied to business decisions."
-                }
-                changing_lines = placeholder_changing_lines(english_name)
-                commentary = {
-                    "wilhelm": f"Traditional interpretation: {general_meaning}",
-                    "modern": f"Contemporary application: {general_meaning}"
-                }
+                interpretations = {}
+                changing_lines = {}
+                commentary = {}
             
             hexagrams[num] = EnhancedHexagram(
                 number=num,
@@ -262,27 +251,21 @@ class EnhancedIChing:
                 
                 hexagrams[num] = EnhancedHexagram(
                     number=num,
-                    chinese_name=f"Hexagram {num}",
+                    chinese_name="",
                     english_name=english_name,
                     unicode_symbol=self._get_unicode_symbol(upper_trigram, lower_trigram),
                     binary=binary,
                     upper_trigram=upper_trigram,
                     lower_trigram=lower_trigram,
-                    judgment=general_meaning,
-                    image=f"The image of {english_name}.",
+                    # No traditional judgment/image text for this hexagram yet; the
+                    # summary in general_meaning is all that is authored. Leaving these
+                    # empty keeps generated filler out of the response.
+                    judgment="",
+                    image="",
                     general_meaning=general_meaning,
-                    interpretations={
-                        "career": f"{general_meaning} Applied to career matters.",
-                        "relationships": f"{general_meaning} Applied to relationship dynamics.",
-                        "creative": f"{general_meaning} Applied to creative endeavors.",
-                        "personal": f"{general_meaning} Applied to personal growth.",
-                        "business": f"{general_meaning} Applied to business decisions."
-                    },
-                    changing_lines=placeholder_changing_lines(english_name),
-                    commentary={
-                        "wilhelm": f"Traditional interpretation: {general_meaning}",
-                        "modern": f"Contemporary application: {general_meaning}"
-                    },
+                    interpretations={},
+                    changing_lines={},
+                    commentary={},
                     content_level="summary"
                 )
         
@@ -384,8 +367,6 @@ class EnhancedIChing:
         for line_num in line_numbers:
             if line_num in hexagram.changing_lines:
                 guidance.append(f"Line {line_num}: {hexagram.changing_lines[line_num]}")
-            else:
-                guidance.append(f"Line {line_num}: Traditional changing line interpretation")
         
         return guidance
     

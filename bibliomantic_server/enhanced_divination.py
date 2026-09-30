@@ -156,11 +156,13 @@ class EnhancedBiblioManticDiviner:
         
         # Enhanced hexagram presentation
         result += f"**Oracle's Guidance - Hexagram {hexagram.number}: {hexagram.english_name}**\n"
-        result += f"*{hexagram.chinese_name} {hexagram.unicode_symbol}*\n\n"
-        
-        # Judgment and Image (core I Ching elements)
-        result += f"**Judgment:** {hexagram.judgment}\n\n"
-        result += f"**Image:** {hexagram.image}\n\n"
+        result += f"*{' '.join(filter(None, [hexagram.chinese_name, hexagram.unicode_symbol]))}*\n\n"
+
+        # Judgment and Image, only where the traditional texts are authored
+        if hexagram.judgment:
+            result += f"**Judgment:** {hexagram.judgment}\n\n"
+        if hexagram.image:
+            result += f"**Image:** {hexagram.image}\n\n"
         
         # Context-specific guidance
         if context != "general" and context in hexagram.interpretations:
@@ -172,13 +174,16 @@ class EnhancedBiblioManticDiviner:
         if changing_lines:
             result += f"**Changing Lines:** {', '.join(map(str, changing_lines))}\n\n"
             line_guidance = self.enhanced_engine.get_changing_line_guidance(hexagram.number, changing_lines)
-            for guidance in line_guidance:
-                result += f"• {guidance}\n"
+            if line_guidance:
+                for guidance in line_guidance:
+                    result += f"• {guidance}\n"
+            else:
+                result += "*Traditional line texts for this hexagram are not yet included.*\n"
             result += "\n"
             
             if resulting_hexagram:
                 result += f"**Resulting Situation - Hexagram {resulting_hexagram.number}: {resulting_hexagram.english_name}**\n"
-                result += f"*{resulting_hexagram.chinese_name} {resulting_hexagram.unicode_symbol}*\n\n"
+                result += f"*{' '.join(filter(None, [resulting_hexagram.chinese_name, resulting_hexagram.unicode_symbol]))}*\n\n"
                 result += f"{resulting_hexagram.general_meaning}\n\n"
         
         # Trigram analysis
@@ -193,12 +198,18 @@ class EnhancedBiblioManticDiviner:
         # Commentary
         if hexagram.commentary.get('wilhelm'):
             result += f"**Traditional Commentary:** {hexagram.commentary['wilhelm']}\n\n"
-        
+
+        # State the gap rather than filling it with generated text
+        if hexagram.content_level != "full":
+            result += ("*Traditional judgment, image, changing-line and commentary texts for this "
+                       "hexagram are not yet included; the summary above is an editorial paraphrase, "
+                       "not a translation.*\n\n")
+
         # Bibliomantic context (maintains existing format)
         result += "**Bibliomantic Context:**\n"
         result += "This enhanced consultation follows Philip K. Dick's approach in \"The Man in the High Castle,\" "
-        result += "now enriched with traditional I Ching elements including changing lines, trigram analysis, "
-        result += "and contextual interpretations for deeper philosophical reflection.\n\n"
+        result += "drawing on the traditional elements this hexagram carries - changing lines, trigram "
+        result += "analysis and contextual interpretation - for deeper philosophical reflection.\n\n"
         
         return result
     

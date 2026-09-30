@@ -69,7 +69,7 @@ def _coverage_lines(coverage: dict) -> str:
         f"- Total Hexagrams: {total} (all with English names, Unicode symbols, trigram analysis and a summary interpretation)\n"
         f"- Traditional Chinese names, judgment and image texts: {traditional} of {total}\n"
         f"- Authored changing-line, contextual and commentary texts: {coverage['full']} of {total} "
-        f"(the rest derive these from the summary until their traditional texts are added)"
+        f"(the rest omit these sections rather than substitute generated text)"
     )
 
 @mcp.tool()
@@ -189,15 +189,28 @@ def get_hexagram_details(hexagram_number: int) -> str:
     if ENHANCED_MODE and hasattr(iching, 'enhanced_engine') and iching.enhanced_engine:
         hexagram = iching.enhanced_engine.hexagrams.get(hexagram_number)
         if hexagram:
+            name_line = " ".join(filter(None, [hexagram.chinese_name, hexagram.unicode_symbol]))
             response = f"""📖 **Hexagram {hexagram.number}: {hexagram.english_name}**
 
-*{hexagram.chinese_name} {hexagram.unicode_symbol}*
+*{name_line}*"""
 
-**Judgment:** {hexagram.judgment}
+            # Judgment and Image only where the traditional texts are authored
+            if hexagram.judgment:
+                response += f"""
 
-**Image:** {hexagram.image}
+**Judgment:** {hexagram.judgment}"""
+            if hexagram.image:
+                response += f"""
 
-**Traditional Interpretation:**
+**Image:** {hexagram.image}"""
+
+            # general_meaning is an editorial summary, so label it as one unless this
+            # entry carries authored traditional text
+            summary_heading = ("Traditional Interpretation"
+                               if hexagram.content_level == "full" else "Summary")
+            response += f"""
+
+**{summary_heading}:**
 {hexagram.general_meaning}"""
 
             # Add trigram information
@@ -217,6 +230,13 @@ def get_hexagram_details(hexagram_number: int) -> str:
 
 **Traditional Commentary:**
 {hexagram.commentary['wilhelm']}"""
+
+            # State the gap rather than filling it with generated text
+            if hexagram.content_level != "full":
+                response += """
+
+*Traditional judgment, image, changing-line and commentary texts for this hexagram
+are not yet included; the summary above is an editorial paraphrase, not a translation.*"""
 
             response += f"""
 
@@ -268,14 +288,20 @@ def get_hexagram_resource(number: str) -> str:
         if ENHANCED_MODE and hasattr(iching, 'enhanced_engine') and iching.enhanced_engine:
             hexagram = iching.enhanced_engine.hexagrams.get(hexagram_num)
             if hexagram:
+                name_line = " ".join(filter(None, [hexagram.chinese_name, hexagram.unicode_symbol]))
+                traditional = ""
+                if hexagram.judgment:
+                    traditional += f"\nJudgment: {hexagram.judgment}\n"
+                if hexagram.image:
+                    traditional += f"\nImage: {hexagram.image}\n"
+                if hexagram.content_level != "full":
+                    traditional += ("\nNote: traditional judgment, image, changing-line and commentary "
+                                    "texts for this hexagram are not yet included; the general meaning "
+                                    "below is an editorial paraphrase, not a translation.\n")
                 return f"""I Ching Hexagram {hexagram.number}: {hexagram.english_name}
 
-Chinese Name: {hexagram.chinese_name} {hexagram.unicode_symbol}
-
-Judgment: {hexagram.judgment}
-
-Image: {hexagram.image}
-
+Chinese Name: {name_line}
+{traditional}
 General Meaning: {hexagram.general_meaning}
 
 Educational Context: This is from the ancient Chinese Book of Changes, a philosophical text used for contemplating patterns of change and decision-making. This information is provided for educational and reflective purposes.
@@ -316,7 +342,8 @@ def get_iching_database() -> str:
         for i in range(1, 65):
             hexagram = iching.enhanced_engine.hexagrams.get(i)
             if hexagram:
-                hexagram_list.append(f"{i:2d}. {hexagram.english_name} ({hexagram.chinese_name} {hexagram.unicode_symbol})")
+                label = " ".join(filter(None, [hexagram.chinese_name, hexagram.unicode_symbol]))
+                hexagram_list.append(f"{i:2d}. {hexagram.english_name} ({label})")
             else:
                 hexagram_list.append(f"{i:2d}. Hexagram {i}")
     else:
