@@ -20,12 +20,18 @@ The Bibliomantic MCP Server is a Model Context Protocol implementation that inte
 - Metadata tracking for transparency in divination process
 - Graceful degradation when divination operations fail
 
-**MCP Server (`bibliomantic_server/ethical_server.py`)**
+**MCP Server (`bibliomantic_server/enhanced_bibliomantic_server.py`)**
 - Official MCP SDK implementation using the MCPServer framework
 - Tools for interactive divination and consultation functions
 - Resources for direct hexagram database access and AI context loading
 - Prompt templates for structured philosophical exploration
-- Comprehensive ethical safeguards in all user-facing responses
+
+**Ethical Disclaimers (`bibliomantic_server/ethics.py`)**
+- `@with_disclaimer()` decorator appends a full or brief guidance note to a tool's result
+- The note is addressed to the assistant, which conveys its points in context rather than quoting boilerplate
+- The same request is carried in the server's MCP `instructions` field
+- Process-wide switch, on by default, disabled by `--no-ethical-disclaimers` in `main.py`
+- `functools.wraps` keeps the tool's name, docstring and schema intact for the MCP SDK
 
 ### MCP Implementation Features
 
@@ -58,7 +64,7 @@ Migrated from custom MCP implementation to the official MCPServer framework (nam
 - Enhanced type safety
 
 ### Ethical Framework Integration
-Implements user-facing ethical disclaimers in all MCP responses to ensure end users understand the system's nature and limitations, addressing responsibility concerns for divination-based AI tools.
+Ethical guidance is injected by a decorator (`bibliomantic_server/ethics.py`) rather than written into each tool. Instead of fixed boilerplate, each result ends with a note asking the assistant to convey the system's nature and limitations in its own words, scaled to the stakes of the user's question. It is on by default and switched off with the `--no-ethical-disclaimers` command-line flag. The server can request this behaviour but not enforce it, since the model writes the final reply. `server_statistics` reports the current setting.
 
 ### Cultural Approach
 Treats I Ching as philosophical tradition rather than supernatural system, providing educational context about ancient Chinese wisdom while respecting cultural origins.
@@ -71,8 +77,8 @@ bibliomantic-mcp-server/
 │   ├── __init__.py                    # Package initialization
 │   ├── __main__.py                    # `python -m bibliomantic_server`
 │   ├── main.py                        # Console-script entry point
-│   ├── enhanced_bibliomantic_server.py # Enhanced MCPServer server (preferred)
-│   ├── ethical_server.py              # Ethical MCPServer server (fallback)
+│   ├── enhanced_bibliomantic_server.py # Enhanced MCPServer server
+│   ├── ethics.py                      # Guidance-note decorator and on/off switch
 │   ├── server.py                      # Original MCPServer server
 │   ├── enhanced_iching_core.py        # Traditional I Ching data layer
 │   ├── enhanced_divination.py         # Enhanced divination system
@@ -83,8 +89,8 @@ bibliomantic-mcp-server/
 ├── LICENSE                           # MIT license
 ├── README.md                         # Project documentation
 └── docs/
-    ├── ETHICAL_SAFEGUARDS.md         # Ethical framework documentation
-    └── IMPLEMENTATION_SUMMARY.md     # This document
+    ├── ADR-001-enhanced-data-layer.md          # Decision record: enhanced data layer
+    └── ADR-002-contextual-ethical-guidance.md  # Decision record: disclaimer decorator and guidance
 ```
 
 ## Dependencies

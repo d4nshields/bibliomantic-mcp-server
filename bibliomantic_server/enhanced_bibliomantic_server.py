@@ -14,6 +14,7 @@ from typing import Optional
 from mcp.server.mcpserver import MCPServer, Context
 
 from . import MCP_SDK_VERSION, MCP_LATEST_PROTOCOL_VERSION
+from .ethics import with_disclaimer, disclaimers_enabled, SERVER_INSTRUCTIONS
 
 # Import enhanced components (with fallback)
 try:
@@ -38,6 +39,7 @@ logger = logging.getLogger(__name__)
 # Create the MCP server
 mcp = MCPServer(
     name="Enhanced Bibliomantic Oracle",
+    instructions=SERVER_INSTRUCTIONS,
     dependencies=["secrets"]
 )
 
@@ -51,14 +53,9 @@ else:
     iching = IChingAdapter()
     logger.info("Bibliomantic MCP Server initialized in compatibility mode")
 
-# Ethical disclaimers (unchanged)
-ETHICAL_DISCLAIMER = """
-⚠️ **Important Notice**: This divination uses cryptographically secure randomness, not supernatural guidance. It's designed for philosophical reflection and entertainment, following Philip K. Dick's literary exploration of meaning-making. Do not use for important financial, medical, legal, or safety decisions. Consult qualified professionals for serious life matters. The wisdom comes from your own reflection, not mystical prediction.
-"""
-
-BRIEF_DISCLAIMER = """
-⚠️ *For reflection and entertainment only. Not for important life decisions.*
-"""
+# Ethical guidance is appended by the @with_disclaimer decorator (see ethics.py) as a
+# note for the assistant to convey in context, unless the server is started with
+# --no-ethical-disclaimers.
 
 
 def _coverage_lines(coverage: dict) -> str:
@@ -73,6 +70,7 @@ def _coverage_lines(coverage: dict) -> str:
     )
 
 @mcp.tool()
+@with_disclaimer()
 def i_ching_divination(query: Optional[str] = None) -> str:
     """
     Enhanced I Ching divination with traditional three-coin method and changing lines.
@@ -96,7 +94,7 @@ def i_ching_divination(query: Optional[str] = None) -> str:
         if result.get("enhanced") and result.get("changing_lines"):
             response += f"\n**Changing Lines:** {', '.join(map(str, result['changing_lines']))}"
         
-        response += f"\n**Purpose:** Philosophical reflection and contemplation\n\n{ETHICAL_DISCLAIMER}"
+        response += "\n**Purpose:** Philosophical reflection and contemplation"
 
         if query:
             response += f"\n\n**Your Question:** {query}"
@@ -115,9 +113,10 @@ def i_ching_divination(query: Optional[str] = None) -> str:
     else:
         error_msg = f"Divination failed: {result.get('error', 'Unknown error')}"
         logger.error(error_msg)
-        return f"{error_msg}\n\n{BRIEF_DISCLAIMER}"
+        return error_msg
 
 @mcp.tool()
+@with_disclaimer()
 def bibliomantic_consultation(query: str) -> str:
     """
     Enhanced bibliomantic consultation with traditional I Ching elements.
@@ -126,19 +125,18 @@ def bibliomantic_consultation(query: str) -> str:
     logger.info("Performing enhanced bibliomantic consultation")
     
     if not query.strip():
-        return f"Please provide a question for bibliomantic consultation.\n\n{BRIEF_DISCLAIMER}"
+        return "Please provide a question for bibliomantic consultation."
     
     # Use enhanced consultation if available
     if ENHANCED_MODE and hasattr(diviner, 'perform_enhanced_consultation'):
         try:
             enhanced_result = diviner.perform_enhanced_consultation(query)
             
-            # Add bibliomantic context and disclaimer
-            enhanced_result += f"\n\n**How to Use This Guidance:**\n"
+            # Add bibliomantic context
+            enhanced_result += "\n\n**How to Use This Guidance:**\n"
             enhanced_result += "Consider how this ancient perspective might offer new ways of thinking about your situation. "
             enhanced_result += "The value lies not in prediction, but in the fresh viewpoints that can emerge from engaging "
-            enhanced_result += "with different frameworks of understanding.\n\n"
-            enhanced_result += ETHICAL_DISCLAIMER
+            enhanced_result += "with different frameworks of understanding."
             
             logger.info("Completed enhanced bibliomantic consultation")
             return enhanced_result
@@ -152,7 +150,7 @@ def bibliomantic_consultation(query: str) -> str:
     if "error" in divination_info:
         error_msg = f"Consultation failed: {divination_info['error']}"
         logger.error(error_msg)
-        return f"{error_msg}\n\n{BRIEF_DISCLAIMER}"
+        return error_msg
     
     response = f"""🔮 **Bibliomantic Consultation**
 
@@ -166,14 +164,13 @@ def bibliomantic_consultation(query: str) -> str:
 This consultation follows the approach described in Philip K. Dick's "The Man in the High Castle," where characters use the I Ching for reflection on complex decisions. The randomness is generated cryptographically, and any wisdom emerges from your own contemplation of the patterns and meanings.
 
 **How to Use This Guidance:**
-Consider how this ancient perspective might offer new ways of thinking about your situation. The value lies not in prediction, but in the fresh viewpoints that can emerge from engaging with different frameworks of understanding.
-
-{ETHICAL_DISCLAIMER}"""
+Consider how this ancient perspective might offer new ways of thinking about your situation. The value lies not in prediction, but in the fresh viewpoints that can emerge from engaging with different frameworks of understanding."""
     
     logger.info(f"Completed bibliomantic consultation with hexagram {divination_info['hexagram_number']}")
     return response
 
 @mcp.tool()
+@with_disclaimer(brief=True)
 def get_hexagram_details(hexagram_number: int) -> str:
     """
     Enhanced hexagram details with traditional Chinese names, Unicode symbols, and rich commentary.
@@ -182,7 +179,7 @@ def get_hexagram_details(hexagram_number: int) -> str:
     logger.info(f"Retrieving enhanced details for hexagram {hexagram_number}")
     
     if not isinstance(hexagram_number, int) or not (1 <= hexagram_number <= 64):
-        return f"Please provide a valid hexagram number between 1 and 64.\n\n{BRIEF_DISCLAIMER}"
+        return "Please provide a valid hexagram number between 1 and 64."
     
     # Use enhanced details if available
     if ENHANCED_MODE and hasattr(iching, 'enhanced_engine') and iching.enhanced_engine:
@@ -239,9 +236,7 @@ The I Ching (Book of Changes) is an ancient Chinese divination text dating back 
 This information is provided for learning about ancient Chinese philosophy and wisdom traditions. The hexagrams offer frameworks for contemplating life's patterns and changes.
 
 **Literary Connection:**
-Philip K. Dick's "The Man in the High Castle" explores how people create meaning through engagement with such traditional systems, highlighting the human tendency to find significance in patterns.
-
-{BRIEF_DISCLAIMER}"""
+Philip K. Dick's "The Man in the High Castle" explores how people create meaning through engagement with such traditional systems, highlighting the human tendency to find significance in patterns."""
             
             logger.info(f"Retrieved enhanced details for hexagram {hexagram_number} - {hexagram.english_name}")
             return response
@@ -261,9 +256,7 @@ The I Ching (Book of Changes) is an ancient Chinese divination text dating back 
 This information is provided for learning about ancient Chinese philosophy and wisdom traditions. The hexagrams offer frameworks for contemplating life's patterns and changes.
 
 **Literary Connection:**
-Philip K. Dick's "The Man in the High Castle" explores how people create meaning through engagement with such traditional systems, highlighting the human tendency to find significance in patterns.
-
-{BRIEF_DISCLAIMER}"""
+Philip K. Dick's "The Man in the High Castle" explores how people create meaning through engagement with such traditional systems, highlighting the human tendency to find significance in patterns."""
     
     logger.info(f"Retrieved basic details for hexagram {hexagram_number} - {name}")
     return response
@@ -449,7 +442,7 @@ def server_statistics() -> str:
 - Contextual Prompt Templates (career, creative, and general guidance)
 
 **Ethical Framework:**
-- All responses include appropriate disclaimers
+- Ethical disclaimers: {"enabled (default); conveyed by the assistant in context" if disclaimers_enabled() else "disabled (--no-ethical-disclaimers)"}
 - Educational and philosophical focus maintained
 - No supernatural or predictive claims made
 - Users guided toward professional consultation for important decisions

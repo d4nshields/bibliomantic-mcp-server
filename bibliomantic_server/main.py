@@ -7,12 +7,22 @@ exploring the bibliomantic approach described in Philip K. Dick's "The Man in th
 with traditional Chinese I Ching elements. How much authored traditional text each hexagram
 carries varies; the server info resource reports exact coverage.
 
-This is the main entry point for the enhanced server when invoked directly by Claude Desktop.
-Maintains backward compatibility with existing configurations.
+This is the main entry point for the server when invoked by an MCP host such as
+Claude Desktop, either via the ``bibliomantic-mcp-server`` console script or
+``python -m bibliomantic_server``.
+
+Command-line options:
+    --no-ethical-disclaimers    Omit the ethical guidance note that is otherwise appended
+                                to every divination, consultation and hexagram-details
+                                result for the assistant to convey in context.
 """
 
-import sys
+import argparse
 import logging
+import sys
+from typing import Optional, Sequence
+
+from .ethics import enable_disclaimers
 
 # Configure logging to stderr (MCP uses stdout for protocol)
 logging.basicConfig(
@@ -22,32 +32,41 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Try to import enhanced server first, fall back to original
-try:
-    from .enhanced_bibliomantic_server import mcp
-    logger.info("Loaded Enhanced Bibliomantic MCP Server with traditional I Ching content")
-except ImportError as e:
-    logger.warning(f"Enhanced server not available ({e}), falling back to original server")
-    try:
-        from .ethical_server import mcp
-        logger.info("Loaded original Bibliomantic MCP Server in compatibility mode")
-    except ImportError as fallback_error:
-        logger.error(f"Failed to load any server: {fallback_error}")
-        # Create a minimal error server to prevent import failure using v2.x architecture
-        from mcp.server.mcpserver import MCPServer
-        mcp = MCPServer("Bibliomantic Oracle - Error State")
-        
-        @mcp.tool()
-        def server_error() -> str:
-            return "Server failed to initialize properly. Please check the logs and ensure all dependencies are installed."
+from .enhanced_bibliomantic_server import mcp  # noqa: E402  (logging must be set up first)
 
-def main():
+logger.info("Loaded Enhanced Bibliomantic MCP Server with traditional I Ching content")
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="bibliomantic-mcp-server",
+        description="Bibliomantic I Ching MCP server (stdio transport).",
+    )
+    parser.add_argument(
+        "--no-ethical-disclaimers",
+        dest="ethical_disclaimers",
+        action="store_false",
+        help="omit the ethical guidance note that is appended by default to "
+             "divination, consultation and hexagram-details results for the "
+             "assistant to convey in context",
+    )
+    return parser
+
+
+def main(argv: Optional[Sequence[str]] = None) -> None:
     """Main entry point for the bibliomantic server."""
+    args = build_parser().parse_args(argv)
+
+    enable_disclaimers(args.ethical_disclaimers)
+    if not args.ethical_disclaimers:
+        logger.info("Ethical disclaimers disabled (--no-ethical-disclaimers)")
+
     try:
         mcp.run()
     except Exception as e:
         logger.error(f"Server failed to start: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
