@@ -225,6 +225,8 @@ Add the following to your `claude_desktop_config.json`:
 }
 ```
 
+Every divination result carries a short ethical guidance note that the assistant conveys in context. To omit it, add `"--no-ethical-disclaimers"` as a final entry in `args` (see [Ethical Disclaimers](#ethical-disclaimers)).
+
 To pin to a specific commit instead of following `main`, append `@<commit-sha>` to the URL, e.g. `git+https://github.com/d4nshields/bibliomantic-mcp-server@44a2bdc`.
 
 ## ⚠️ Security & Supply Chain Notice
@@ -268,6 +270,8 @@ If you prefer to run the server entirely on your local machine using standard I/
      }
    }
    ```
+
+   Append `"--no-ethical-disclaimers"` to `args` if you do not want disclaimers in responses.
    
    
 ## Example Usage
@@ -352,6 +356,28 @@ A user might work normally with an LLM for an extended period and invoke the ora
 
 This keeps the oracle in approximately the role it occupies in *The Man in the High Castle*: something consulted when a character—or in this case, a user—decides to consult it.
 
+## Ethical Disclaimers
+
+The server appends a short guidance note to each `i_ching_divination`, `bibliomantic_consultation` and `get_hexagram_details` result. The note is addressed to the assistant, not quoted to you. It asks the assistant to make sure you understand, in its own words:
+
+* the hexagram was chosen by secure randomness, not supernatural guidance
+* it is a prompt for reflection and entertainment, not a prediction
+* for financial, medical, legal or safety decisions you should consult a qualified professional
+
+The assistant is asked to fit this to the question: a light touch for a casual reading, an explicit caution when a serious decision is involved. The same request is repeated in the server's MCP `instructions` field.
+
+Because an MCP tool result is read by the model, which then writes its own reply, the server can ask for this but cannot enforce it. To see the raw note, expand the tool call in your MCP host.
+
+This is **on by default**. Turn it off by starting the server with:
+
+```bash
+python -m bibliomantic_server --no-ethical-disclaimers
+```
+
+or by adding `"--no-ethical-disclaimers"` to the `args` list in your MCP host configuration. `server_statistics` reports whether disclaimers are currently enabled.
+
+Internally the note is applied by a `@with_disclaimer()` decorator in `bibliomantic_server/ethics.py`, so the tool bodies contain no disclaimer text themselves. The design and its trade-offs are recorded in [ADR-002](docs/ADR-002-contextual-ethical-guidance.md).
+
 ## Intended Uses
 
 Good uses include:
@@ -405,6 +431,8 @@ The server requires no external API to perform a consultation.
 
 ```bash
 python -m bibliomantic_server
+python -m bibliomantic_server --no-ethical-disclaimers    # without disclaimers
+python -m bibliomantic_server --help
 ```
 
 ### MCP Inspector
