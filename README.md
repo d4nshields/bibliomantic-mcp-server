@@ -227,7 +227,7 @@ Add the following to your `claude_desktop_config.json`:
 
 Every divination result carries a short ethical guidance note that the assistant conveys in context. To omit it, add `"--no-ethical-disclaimers"` as a final entry in `args` (see [Ethical Disclaimers](#ethical-disclaimers)).
 
-To pin to a specific commit instead of following `main`, append `@<commit-sha>` to the URL, e.g. `git+https://github.com/d4nshields/bibliomantic-mcp-server@44a2bdc`.
+To pin to a specific commit instead of following `main`, append `@<commit-sha>` to the URL, e.g. `git+https://github.com/d4nshields/bibliomantic-mcp-server@45bd909`.
 
 ## ⚠️ Security & Supply Chain Notice
 
