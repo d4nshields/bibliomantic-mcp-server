@@ -229,6 +229,35 @@ Every divination result carries a short ethical guidance note that the assistant
 
 To pin to a specific commit instead of following `main`, append `@<commit-sha>` to the URL, e.g. `git+https://github.com/d4nshields/bibliomantic-mcp-server@45bd909`.
 
+#### Staying up to date
+
+`uvx` keeps the installed package in a local cache, so after a new version is published your host may keep launching the build it already has. To make `uvx` check GitHub for this package every time the server starts, add `--refresh-package` before `--from`:
+
+```json
+{
+  "mcpServers": {
+    "bibliomantic": {
+      "command": "uvx",
+      "args": [
+        "--refresh-package",
+        "bibliomantic-mcp-server",
+        "--from",
+        "git+https://github.com/d4nshields/bibliomantic-mcp-server",
+        "bibliomantic-mcp-server"
+      ]
+    }
+  }
+}
+```
+
+Things to know before you add it:
+
+* **It only affects startup.** The check happens once, when the host launches the server. In our testing it added a fraction of a second, and tool calls are not slowed at all.
+* **Every launch then needs the network.** If GitHub or the package index cannot be reached, the server may fail to start where a cached copy would have worked. For everyday use you can leave the flag out and add it only when you want to pick up an update.
+* **Prefer `--refresh-package` to `--refresh`.** Plain `--refresh` rechecks every cached dependency, not just this package, and is slower for no benefit here.
+* **A pinned commit never needs it.** If you pinned the URL to a commit as described above, that version cannot change. To update, change the commit in the URL.
+* **Restart the host afterwards.** The server process is started once and keeps its code in memory. New code is only loaded when the host starts the server again, which for Claude Desktop means quitting it completely (from the system tray on Windows, not just closing the window) and reopening it.
+
 ## ⚠️ Security & Supply Chain Notice
 
 Model Context Protocol (MCP) servers run with local system permissions granted by your AI host (like Claude Desktop). Running servers directly from remote sources introduces security risks. 
@@ -272,6 +301,13 @@ If you prefer to run the server entirely on your local machine using standard I/
    ```
 
    Append `"--no-ethical-disclaimers"` to `args` if you do not want disclaimers in responses.
+
+4. **Updating later:**
+   A manual install does not update itself. To move to a newer version, pull the changes and install again, then restart your MCP host completely so it launches the new code:
+   ```bash
+   git pull
+   pip install .
+   ```
    
    
 ## Example Usage

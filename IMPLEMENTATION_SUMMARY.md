@@ -108,6 +108,7 @@ Previous custom implementation required FastAPI, uvicorn, httpx, and custom HTTP
 - `uvx bibliomantic-mcp-server`: Recommended installation method
 - `pip install bibliomantic-mcp-server`: Alternative installation
 - Direct execution: `python -m bibliomantic_server`
+- Updating: `uvx` caches the installed package; add `--refresh-package bibliomantic-mcp-server` to its arguments to recheck the source at each server start, or pin a commit for a fixed version. See "Staying up to date" in the README
 
 ### Claude Desktop Integration
 Standard MCP server configuration with stdio transport for seamless integration with Claude Desktop and other MCP-compatible hosts.

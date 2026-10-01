@@ -9,6 +9,19 @@ github:
       ]
     }
 
+github, always fetch latest main (test platforms; needs network at every start):
+
+    "bibliomantic": {
+      "command": "uvx",
+      "args": [
+        "--refresh-package",
+        "bibliomantic-mcp-server",
+        "--from",
+        "git+https://github.com/d4nshields/bibliomantic-mcp-server",
+        "bibliomantic-mcp-server"
+      ]
+    }
+
 local filesystem (windows):
 
     "bibliomantic": {
